@@ -5,16 +5,17 @@ up to make it easy for you to get up and running in Eclipse as well.
 
 1. Open a terminal window and navigate to your Eclipse workspace.
 2. Once there, clone the repository into your workspace with the command
-     git clone git@github.com:toddbernhard/Boids.git
+```git clone git@github.com:toddbernhard/Boids.git```
    This will copy all of the files over.
-3. Open Eclipse and go to "File"->"Import...", then
+3. Open Eclipse and go to "File"->"Import...," then
    "General"->"Existing Projects into Workspace"
-4. At the next screen, select the "Select root directory" and "Browse", and select
-   the directory that Git just downloaded for you.
+4. At the next screen, select the "Select root directory" and "Browse," and select
+   the directory in your workspace named "Boids" that Git just downloaded for you.
+5. Make sure the checkbox next to the Boids project is checked and click "Finish."
 5. Eclipse show that there are errors in the project and that it can't locate
    the processing.core library (core.jar), because it expects to find it in the
    root directory, so we must copy it over there.
-6. Copy core.jar from the project directory to your root directory
+6. Copy core.jar from the project directory to your root directory.
 7. DONE!
 
 I know keeping core.jar (it's Processing's core library) in the root directory is

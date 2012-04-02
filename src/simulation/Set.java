@@ -2,13 +2,17 @@ package simulation;
 
 import processing.core.PVector;
 
+/*
+ * Settings
+ */
+
 public class Set {
 	
 	// TODO why is this here? where is it from
 	//	public static final int AVOID_RADIUS = 10;
 	
 						   // Format =    [ Scrn W, Scrn H, Edge ]
-	public static final int[][] screen =  {{  800,     600,     50  },
+	public static final int[][] screen =  {{  800,     600,   50 },
 										   {  800,    600,    50 },
 										   { 1200,    675,     0 },
 										   {  800,    600,    50 }};   
@@ -25,7 +29,7 @@ public class Set {
 												{ 200,      0,    300,         0,         0,      0,     2    },
 												{ 200,      0,     25,         0,         0,      3,     2    }};
 				    
-	public static final int config_n = 0;
+	public static final int config_n = 1;
 
 	public static final int SCREEN_Width =  screen[config_n][0];
 	public static final int SCREEN_Height = screen[config_n][1];
