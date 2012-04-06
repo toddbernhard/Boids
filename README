@@ -16,11 +16,12 @@ up to make it easy for you to get up and running in Eclipse as well.
    the processing.core library (core.jar), because it expects to find it in the
    root directory, so we must copy it over there.
 6. Copy core.jar from the project directory to your root directory.
-7. DONE!
+7. DONE! The errors should be gone, just run it as an Applet, and you're good to
+   go!
 
 
 I know keeping core.jar (it's Processing's core library) in the root directory is
 an ugly fix, but we need an absolute path that everyone can use. If you move
-core.jar, you'll change the .classpath and we will end up in an edit war over
+core.jar, you'll change the .classpath file and we will end up in an edit war over
 that path.  So, sorry, but it's quick and dirty and works. Let me know if you
 know of a more elegant solution! 
