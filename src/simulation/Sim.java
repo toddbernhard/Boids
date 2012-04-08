@@ -3,6 +3,8 @@ package simulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import processing.opengl.*;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 import boids.Fish;
@@ -25,7 +27,7 @@ public class Sim extends PApplet{
 	@Override
 	public void setup() {
 		
-		size(Set.SCREEN_Width, Set.SCREEN_Height);  // Set the screen size
+		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 		
 		frameCounter = 0;
 		rand = new Random();
