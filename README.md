@@ -21,19 +21,20 @@
 
         sudo rm /core.jar
 
- - NOTE: If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them
+ - _NOTE:_ If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them
 
         cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/
         cp [YOUR OS]/* linux64/
 
    where `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or  `windows 64`. Note the _*_ in `[YOUR OS]/*`
- - DONE!
+
+ - _DONE!_
 
 
 
 
 __[Depreciated, to be updated]__
-### How to get started:
+_How to get started:_
 
 The Boids simulation was written in Java using Eclipse and this repository is set
 up to make it easy for you to get up and running in Eclipse as well.
