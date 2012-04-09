@@ -1,7 +1,7 @@
 ### Upgrading from v1.0:
 
 1. Make sure you have the master checked out by typing into a bash terminal
-    git co master
+        git co master
 2. Use the command
 
 ```
