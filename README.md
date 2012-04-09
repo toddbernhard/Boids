@@ -21,12 +21,11 @@
 
         sudo rm /core.jar
 
- - _NOTE:_ If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them
+ - _NOTE:_ If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them.  In the following command, replace `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or  `windows 64`. Note the _*_ in `[YOUR OS]/*`
 
         cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/
         cp [YOUR OS]/* linux64/
 
-   where `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or  `windows 64`. Note the _*_ in `[YOUR OS]/*`
 
  - _DONE!_
 
