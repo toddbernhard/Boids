@@ -1,29 +1,37 @@
 ### Upgrading from v1.0:
 
 1. Make sure you have the master checked out by typing into a bash terminal
-        git co master
+
+       git co master
+
 2. Use the command
 
-```
-git pull --rebase origin master
-```
+       git pull --rebase origin master
 
-to pull down the latest updates, OVERWRITING your version (`--rebase` causes the overwrite)
-3. Download the latest version of Processing at http://processing.org/download/ and unpack it
+to pull down the latest updates, __overwriting__ your version (`--rebase` causes the overwrite)
+3. Download the latest version of [Processing](http://processing.org/download/) and unpack it
 4. Create a boids directory in your root (/) folder
-    sudo mkdir /boids
+
+       sudo mkdir /boids
+
 5. Copy the unpacked processing folder to the directory you just created
-    sudo cp -r ~/your_downloads/processing-1.5.1/ /boids/
+
+       sudo cp -r ~/your_downloads/processing-1.5.1/ /boids/
+
 6. You can delete the core.jar from your root, it's now in that new boids folder
-    sudo rm /core.jar
+
+       sudo rm /core.jar
+
 7. NOTE: If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them
-    cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/
-    cp [YOUR OS]/* linux64/
-   where `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or `windows 64`. Note the * in `[YOUR OS]/*`
+
+       cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/
+       cp [YOUR OS]/* linux64/
+
+   where `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or  `windows 64`. Note the _*_ in `[YOUR OS]/*`
 8. DONE!
 
 
-[Depreciated, to be updated]
+__[Depreciated, to be updated]__
 ### How to get started:
 
 The Boids simulation was written in Java using Eclipse and this repository is set
