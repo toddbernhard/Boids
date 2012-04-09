@@ -3,10 +3,12 @@
 1. Make sure you have the master checked out by typing into a bash terminal
     git co master
 2. Use the command
+
 ```
 git pull --rebase origin master
 ```
-   to pull down the latest updates, OVERWRITING your version (`--rebase` causes the overwrite)
+
+to pull down the latest updates, OVERWRITING your version (`--rebase` causes the overwrite)
 3. Download the latest version of Processing at http://processing.org/download/ and unpack it
 4. Create a boids directory in your root (/) folder
     sudo mkdir /boids
