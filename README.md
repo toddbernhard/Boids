@@ -1,47 +1,39 @@
-Upgrading from v1.0:
---------------------
+### Upgrading from v1.0:
 
-1. Make sure you have the master checked out by typing in the terminal
-  `git co master`
+1. Make sure you have the master checked out by typing into a bash terminal
+   git co master
 2. Use the command
-  `git pull --rebase origin master`
-   to pull down the latest updates, OVERWRITING your version
-   (--rebase causes the overwrite)
-3. Download the latest version of Processing at [http://processing.org/download/]
-   and unpack it
+    git pull --rebase origin master
+   to pull down the latest updates, OVERWRITING your version (`--rebase` causes the overwrite)
+3. Download the latest version of Processing at http://processing.org/download/ and unpack it
 4. Create a boids directory in your root (/) folder
-   `sudo mkdir /boids`
+    sudo mkdir /boids
 5. Copy the unpacked processing folder to the directory you just created
-  `sudo cp -r ~/your_downloads/processing-1.5.1/ /boids/`
+    sudo cp -r ~/your_downloads/processing-1.5.1/ /boids/
 6. You can delete the core.jar from your root, it's now in that new boids folder
-   `sudo rm /core.jar`
-7. NOTE: If you are NOT using a 64-bit Linux distribution, you must copy your
-   respective shared libraries over to where Eclipse expects to find them
-'''cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/'''
-'''cp [YOUR OS]/* linux64/'''
-   where [YOUR OS] is linux32, macosx, windows32, or windows 64. Note the * after
-   the [YOUR OS]/
+    sudo rm /core.jar
+7. NOTE: If you are NOT using a 64-bit Linux distribution, you must copy your respective shared libraries over to where Eclipse expects to find them
+    cd /boids/processing-1.5.1/modes/java/libraries/opengl/library/
+    cp [YOUR OS]/* linux64/
+   where `[YOUR OS]` is `linux32`, `macosx`, `windows32`, or `windows 64`. Note the * in `[YOUR OS]/*`
 8. DONE!
 
 
 [Depreciated, to be updated]
-How to get started:
--------------------
+### How to get started:
 
 The Boids simulation was written in Java using Eclipse and this repository is set
 up to make it easy for you to get up and running in Eclipse as well.
 
 1. Open a terminal window and navigate to your Eclipse workspace.
 2. Once there, clone the repository into your workspace with the command
-```git clone git@github.com:toddbernhard/Boids.git```
+    git clone git@github.com:toddbernhard/Boids.git
    This will copy all of the files over.
 3. Open Eclipse and go to "File"->"Import...," then
    "General"->"Existing Projects into Workspace"
-4. At the next screen, select the "Select root directory" and "Browse," and select
-   the directory in your workspace named "Boids" that Git just downloaded for you.
+4. At the next screen, select the "Select root directory" and "Browse," and select the directory in your workspace named "Boids" that Git just downloaded for you.
 5. Make sure the checkbox next to the Boids project is checked and click "Finish."
-5. Eclipse show that there are errors in the project and that it can't locate
-   the processing.core library (core.jar), because it expects to find it in the
+5. Eclipse show that there are errors in the project and that it can't locate the processing.core library (core.jar), because it expects to find it in the
    root (/) directory, so we must copy it over there.
 6. Copy core.jar from the project directory to your root directory.
 7. DONE! The errors should be gone, just run it as an Applet, and you're good to
