@@ -1,13 +1,14 @@
 package simulation;
 
-import processing.core.PVector;
+import processing.core.*;
+//import processing.core.PVector;
 
 /*
  * Settings
  */
 
 public class Set {
-	
+		
 	// TODO why is this here? where is it from
 	//	public static final int AVOID_RADIUS = 10;
 	
