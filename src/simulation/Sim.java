@@ -3,6 +3,9 @@ package simulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import kinect.Kinect;
+import kinect.KinectConfig;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 import boids.Fish;
@@ -34,14 +37,7 @@ public class Sim extends PApplet{
 		school = new ArrayList<Boid>();
 		
 		kinect = new Kinect(this,Kinect.MOTION_DETECTION);
-		
-		/*
-		if( Set.NUMBER_Fish > 0 ) {
-			registerColors( new Fish(0,0,0,0) );
-		}
-		if( Set.NUMBER_Sharks > 0 ) {
-			registerColors( new Shark(0,0,0,0) );
-		}*/
+		kinect.init();
 		
 		// Create new fish with random position in screen and random speed
 		for( int i=0;
@@ -73,23 +69,6 @@ public class Sim extends PApplet{
 			}
 		}
 		
-		/*
-		// Create new yellowfish with random position and random speed
-		for( int i=0; i<Set.NUMBER_YellowFish; i++ ) {
-			
-			// position = anywhere
-			// speed = [-.25max, .25max]
-			// size = see settings
-			school.add( new Fish( rand.nextFloat()*Set.SCREEN_Width, rand.nextFloat()*Set.SCREEN_Height,
-								 (rand.nextFloat()-.5f)*Set.FISH_MaxSpeed/2,
-								 (rand.nextFloat()-.5f)*Set.FISH_MaxSpeed/2,
-								  Set.FISH_MinSize + rand.nextInt(Set.FISH_MaxSize-Set.FISH_MinSize),
-								  this, Fish.GREEN )  );
-			if( Set.SHOW_Groups ) {
-				//school.get(i).color = Boid.colors[i%Boid.colors.length];
-			}
-		}
-		*/
 		
 		if( Set.NUMBER_Obstacles > 0 ) {
 			for( int i=0; i<Set.NUMBER_Obstacles; i++ ) {
@@ -119,15 +98,22 @@ public class Sim extends PApplet{
 	@Override
 	public void draw() {
 		
+		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
+			background(0, 20, 80); // Clear screen
+			
+			for (int i = 0; i < kinect.goodPixels.length; i++) {
+				if( kinect.config.stdDevs.get(kinect.goodPixels[i]) > kinect.config.stdDevThreshold ) {
+					stroke(255);
+					point(Boid.redoRange(kinect.goodPixels[i]%640,0,800,0,640), Boid.redoRange(kinect.goodPixels[i]/640,0,600,0,480));
+				}
+			}
+		}
+		else
+		
 		if( Set.paused == false ) {
 			frameCounter++;
 			
-			// If we still need to calibrate, do so
-			if(frameCounter<=Set.KINECT_CalibrationTime) {
-				background(0);
-				kinect.calibrate();
-			}else {
-				if( frameCounter%2 == 0 ) {
+				if( frameCounter%Set.KINECT_FrameRatio == 0 ) {
 					kinect.update();
 				}
 			
@@ -139,12 +125,12 @@ public class Sim extends PApplet{
 					rect(Set.SCREEN_Width / 2, Set.SCREEN_Height / 2,
 							Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize);
 				}
-
+				/*
 				// TODO Groups don't work
 				if (Set.SHOW_Groups) {
 					Boid.group(school);
 				}
-
+				*/
 				for (int i = 0; i < school.size(); i++) {
 
 					school.get(i).step(school);
@@ -152,22 +138,36 @@ public class Sim extends PApplet{
 
 				}
 
-				int[] scene = kinect.depthMap;
-				for (int i = 0; i < scene.length; i++) {
-					if (scene[i] < -2000) {
-						stroke(255);
-					} else if (scene[i] < -1000) {
-						stroke(255,255,255,150);
-					} else if (scene[i] < -500) {
-						stroke(255,255,255,100);
-					} else {
-						continue;
+				if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust ) {
+					for (int i = 0; i < kinect.goodPixels.length; i++) {
+						
+						if( kinect.diffMap[kinect.goodPixels[i]] < kinect.config.range ) {
+							stroke(0,255,0,kinect.config.rangeAlpha);
+						}
+						else if( kinect.diffMap[kinect.goodPixels[i]] > kinect.config.range+kinect.config.rangeSize ) {
+							if( kinect.config.rangeBg ) {
+								stroke(255,0,0,kinect.config.rangeAlpha);
+							} else {
+								continue;
+							}
+						}
+						else if( kinect.diffMap[kinect.goodPixels[i]] > kinect.config.range+(kinect.config.rangeSize/2) ) {
+							stroke( Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 0,100, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 0,255, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 255,100, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									kinect.config.rangeAlpha);
+						} else { //if( kinect.diffMap[i] > kinect.config.range+(kinect.config.rangeSize/2) ) {
+							stroke( Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 100,255, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 100,0, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 255,200, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
+									kinect.config.rangeAlpha);
+						}
+						
+						point(Boid.redoRange(kinect.goodPixels[i] % 640, 0, 800, 0, 640),
+								Boid.redoRange(kinect.goodPixels[i] / 640, 0, 600, 0, 480));
 					}
-					// stroke(Boid.redoRange(scene[i],0,4500,0,255));
-					point(Boid.redoRange(i%640,0,800,0,640), Boid.redoRange(i/640,0,600,0,480));
-				}
+				}				
 			}
-		}
 		// else
 	
 	}
@@ -178,10 +178,19 @@ public class Sim extends PApplet{
 	@Override
 	public void keyPressed() {
 		
+		if( keyCode == ESC ) {
+			System.exit(0);
+		}
+		
 		if( key == ' ' ) {
 			Set.paused = !Set.paused;
 		}
 		
+		if( Set.KINECT_SetupMode ) {
+			
+			kinect.config.keyPressed(key,keyCode);
+			
+		}
 	}
 
 	/*

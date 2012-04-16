@@ -1,8 +1,6 @@
 package simulation;
 import java.util.ArrayList;
 
-import boids.Fish;
-
 
 import processing.core.PVector;
 
@@ -85,7 +83,7 @@ public abstract class Boid {
 		return accel;
 		
 	}
-	
+	/*
 	public static void group( ArrayList<Boid> school ) {
 		
 		ArrayList<ArrayList<Boid>> groups = new ArrayList<ArrayList<Boid>>();
@@ -108,7 +106,7 @@ public abstract class Boid {
 			}
 		}
 		*/
-		
+		/*
 		for( Boid boid : school ) {
 			if( boid.grouped == false ) {
 				groups.add( new ArrayList<Boid>() );
@@ -187,9 +185,9 @@ public abstract class Boid {
 			
 			}
 		}
-		*/
+		
 	}
-	
+	*/
 	
 	protected void groupHelper( ArrayList<Boid> school, ArrayList<Boid> group ) {
 		
@@ -314,6 +312,9 @@ public abstract class Boid {
 	
 	public static float redoRange( float value, float targetMin, float targetMax,
 								   				float sourceMin, float sourceMax ) {
+		if( value < sourceMin || value > sourceMax ) {
+			//System.out.printf("warning: value %f outside range [%f,%f]\n",value,sourceMin,sourceMax);
+		}
 		return (value-sourceMin) * ((targetMax-targetMin)/(sourceMax-sourceMin)) + targetMin;
 	}
 	
