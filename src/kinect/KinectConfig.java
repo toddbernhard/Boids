@@ -10,6 +10,7 @@ public class KinectConfig {
 	public static final int MODE_StdDevAdjust	= 1;
 	public static final int MODE_RangeAdjust	= 2;
 	public static final int MODE_AlphaAdjust 	= 3;
+	public static final int MODE_Test			= 4;
 	
 	public int mode;
 	public float stdDevThreshold;
@@ -104,6 +105,12 @@ public class KinectConfig {
 				kinect.filter = !kinect.filter;
 				System.out.println( kinect.filter ? "Filter=ON" : "Filter=OFF" );
 				kinect.refreshGoodPixels();
+				break;
+			case '6':
+			case 't':
+			case 'T':
+				mode = MODE_Test;
+				System.out.println("test mode");
 				break;
 			case 'n':
 			case 'N':

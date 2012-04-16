@@ -13,21 +13,30 @@ public class Set {
 	public static final int[][] screen =  {{  800,     600,   50 },
 										   {  800,    600,    50 },
 										   { 1200,    675,     0 },
-										   {  800,    600,    50 }};   
+										   {  800,    600,    50 },
+										   {  800,    600,    50 }};
+	
+	public static final boolean[][] kinect = {{ false, false },
+											  { false, false },
+											  { false, false },
+											  { false, false },
+											  { true,  true  }};
 	
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget
 	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false },
 														{ false, false, false, false, false,  true, false },
 		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false },
+														{ false, false, false, false, false,  true, false },
 														{ false, false, false, false, false,  true, false }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	public static final int[][] populations =  {{  75,     75,     75,        75,         0,      0,     3    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 200,      0,    300,         0,         0,      0,     2    },
-												{ 200,      0,     25,         0,         0,      3,     2    }};
+												{ 200,      0,     25,         0,         0,      3,     2    },
+												{ 200,      0,    100,         0,         0,      0,     0    }};
 				    
-	public static final int config_n = 1;
+	public static final int config_n = 4;
 
 	public static final int SCREEN_Width = 			screen[config_n][0];
 	public static final int SCREEN_Height =			screen[config_n][1];
@@ -35,10 +44,11 @@ public class Set {
 	public static final int SCREEN_FrameRate =		30; // Maximum framerate
 	
 	
+	public static final boolean KINECT_On 			= true;
 	public static final int KINECT_CalibrationLevel = 1000;	// Calibration sample size
 	public static final int KINECT_FrameRatio		= 2;	// # of frames per Kinect update
 	public static final boolean KINECT_FancyStart	= false; // BROKEN 
-	public static final boolean KINECT_SetupMode	= true;
+	public static final boolean KINECT_SetupMode	= (KINECT_On && true);
 	
 	public static final boolean SHOW_Bases =            display_toggles[config_n][0]; // Local coordinate system for each fish
 	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel

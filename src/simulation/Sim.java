@@ -26,6 +26,8 @@ public class Sim extends PApplet{
 	public ArrayList<Boid> school;
 	public Kinect kinect;
 	
+	private int[][] pointCloud;
+	
 	@Override
 	public void setup() {
 		
@@ -36,9 +38,11 @@ public class Sim extends PApplet{
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 		
-		kinect = new Kinect(this,Kinect.MOTION_DETECTION);
-		kinect.init();
-		
+		if( Set.KINECT_On ) {
+			kinect = new Kinect(this,Kinect.MOTION_DETECTION);
+			kinect.init();
+		}
+			
 		// Create new fish with random position in screen and random speed
 		for( int i=0;
 			 i<Set.NUMBER_FishRed+Set.NUMBER_FishBlue+Set.NUMBER_FishGreen+Set.NUMBER_FishYellow;
@@ -113,8 +117,12 @@ public class Sim extends PApplet{
 		if( Set.paused == false ) {
 			frameCounter++;
 			
-				if( frameCounter%Set.KINECT_FrameRatio == 0 ) {
+				if( kinect != null && frameCounter%Set.KINECT_FrameRatio == 0 ) {
 					kinect.update();
+					
+					if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_Test ) {
+						int[][] pointCloud = kinect,generatePointCloud(5);
+					}
 				}
 			
 				background(0, 20, 80); // Clear screen
@@ -131,11 +139,17 @@ public class Sim extends PApplet{
 					Boid.group(school);
 				}
 				*/
-				for (int i = 0; i < school.size(); i++) {
-
-					school.get(i).step(school);
-					drawBoid(school.get(i));
-
+				
+				if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_Test ) {
+					for (int i = 0; i < school.size(); i++) {
+						school.get(i).step(school, pointCloud);
+						drawBoid(school.get(i));
+					}				
+				} else {
+					for (int i = 0; i < school.size(); i++) {
+						school.get(i).step(school);
+						drawBoid(school.get(i));
+					}
 				}
 
 				if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust ) {
@@ -179,6 +193,7 @@ public class Sim extends PApplet{
 	public void keyPressed() {
 		
 		if( keyCode == ESC ) {
+			System.out.println("Goodbye");
 			System.exit(0);
 		}
 		

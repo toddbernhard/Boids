@@ -113,6 +113,15 @@ public class Kinect {
 		}
 		
 	}
+	
+	/*
+	 * 
+	 */
+	public void generatePointCloud(int interval) {
+		
+		
+		
+	}
 
 	/*
 	 * BROKEN
