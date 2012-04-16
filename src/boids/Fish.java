@@ -319,7 +319,7 @@ public class Fish extends Boid implements Aware, Flockable {
 			answer[i][1] = Set.FISH_Styles[style][1];
 			answer[i][2] = Set.FISH_Styles[style][2];
 			answer[i][3] = (int) (255-Set.FISH_ShimmerDepth + Set.FISH_ShimmerDepth * Math.abs( ( Math.cos(
-									Boid.redoRange( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
+									Boid.redoRangeERROR( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
 								  		) ) ) );
 		}
 		
@@ -328,7 +328,7 @@ public class Fish extends Boid implements Aware, Flockable {
 			answer[i][1] = Set.FISH_Styles[style][4];
 			answer[i][2] = Set.FISH_Styles[style][5];
 			answer[i][3] = (int) (255-Set.FISH_ShimmerDepth + Set.FISH_ShimmerDepth * Math.abs( ( Math.cos(
-									Boid.redoRange( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
+									Boid.redoRangeERROR( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
 								  		) ) ) );
 		}
 		return answer;

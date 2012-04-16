@@ -3,8 +3,6 @@ package simulation;
 import java.util.ArrayList;
 import java.util.Random;
 
-import processing.opengl.*;
-
 import processing.core.PApplet;
 import processing.core.PVector;
 import boids.Fish;
@@ -17,12 +15,13 @@ import boids.Shark;
 @SuppressWarnings("serial")
 public class Sim extends PApplet{
 
-	public static int frameCounter;  // Used for animation and color cycles
+	public static int frameCounter;  // Used for animation and color cycles. Shadows p5's frameCount, but is public
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
 	
 	public ArrayList<Boid> school;
+	public Kinect kinect;
 	
 	@Override
 	public void setup() {
@@ -33,6 +32,8 @@ public class Sim extends PApplet{
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
+		
+		kinect = new Kinect(this,Kinect.MOTION_DETECTION);
 		
 		/*
 		if( Set.NUMBER_Fish > 0 ) {
@@ -119,29 +120,53 @@ public class Sim extends PApplet{
 	public void draw() {
 		
 		if( Set.paused == false ) {
-		
-			background(0,20,80);  // Clear screen
-		
-			// If we have obstacles and target is turned on,  draw it
-			if( Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true ) {
-				fill( 150, 0, 0, 40 );
-				rect( Set.SCREEN_Width/2, Set.SCREEN_Height/2, Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize );
-			}
-		
-			// TODO Groups don't work
-			if( Set.SHOW_Groups ) {
-				Boid.group( school );
-			}
-			
-			for( int i=0; i<school.size(); i++ ) {
-			
-				school.get(i).step( school );
-				drawBoid( school.get(i) );
-			
-			}
-		
 			frameCounter++;
-		
+			
+			// If we still need to calibrate, do so
+			if(frameCounter<=Set.KINECT_CalibrationTime) {
+				background(0);
+				kinect.calibrate();
+			}else {
+				if( frameCounter%2 == 0 ) {
+					kinect.update();
+				}
+			
+				background(0, 20, 80); // Clear screen
+
+				// If we have obstacles and target is turned on, draw it
+				if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
+					fill(150, 0, 0, 40);
+					rect(Set.SCREEN_Width / 2, Set.SCREEN_Height / 2,
+							Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize);
+				}
+
+				// TODO Groups don't work
+				if (Set.SHOW_Groups) {
+					Boid.group(school);
+				}
+
+				for (int i = 0; i < school.size(); i++) {
+
+					school.get(i).step(school);
+					drawBoid(school.get(i));
+
+				}
+
+				int[] scene = kinect.depthMap;
+				for (int i = 0; i < scene.length; i++) {
+					if (scene[i] < -2000) {
+						stroke(255);
+					} else if (scene[i] < -1000) {
+						stroke(255,255,255,150);
+					} else if (scene[i] < -500) {
+						stroke(255,255,255,100);
+					} else {
+						continue;
+					}
+					// stroke(Boid.redoRange(scene[i],0,4500,0,255));
+					point(Boid.redoRange(i%640,0,800,0,640), Boid.redoRange(i/640,0,600,0,480));
+				}
+			}
 		}
 		// else
 	

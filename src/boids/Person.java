@@ -53,7 +53,7 @@ public class Person extends Boid {
 			}
 			
 			speed.x = 2*(Sim.rand.nextFloat()-.5f)*Set.PERSON_HorizSpeedVar;
-			speed.y = (position.y!=0?-1:1)*Boid.redoRange( Sim.rand.nextFloat(), Set.PERSON_MinSpeed, Set.PERSON_MaxSpeed);
+			speed.y = (position.y!=0?-1:1)*Boid.redoRangeERROR( Sim.rand.nextFloat(), Set.PERSON_MinSpeed, Set.PERSON_MaxSpeed);
 			
 			/*
 			int i = rand.nextInt(8);

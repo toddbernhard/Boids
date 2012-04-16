@@ -1,7 +1,5 @@
 package simulation;
 
-import processing.core.PVector;
-
 /*
  * Settings
  */
@@ -34,7 +32,9 @@ public class Set {
 	public static final int SCREEN_Width =  screen[config_n][0];
 	public static final int SCREEN_Height = screen[config_n][1];
 	public static final int SCREEN_EdgeWidth =    screen[config_n][2];
-
+	
+	
+	public static final int KINECT_CalibrationTime = 100;
 
 	public static final boolean SHOW_Bases =            display_toggles[config_n][0]; // Local coordinate system for each fish
 	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel
