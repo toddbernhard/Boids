@@ -2,17 +2,22 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/boids/processing-1.5.1/lib/core.jar"/>
-	<classpathentry kind="lib" path="/boids/processing-1.5.1/modes/java/libraries/opengl/library/gluegen-rt.jar">
+	<classpathentry kind="lib" path="/Users/vestibule/sketchbook/libraries/Java/core.jar"/>
+	<classpathentry kind="lib" path="/Users/vestibule/sketchbook/libraries/Java/opengl/library/gluegen-rt.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/boids/processing-1.5.1/modes/java/libraries/opengl/library/linux64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/vestibule/sketchbook/libraries/Java/opengl/library/macosx"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/boids/processing-1.5.1/modes/java/libraries/opengl/library/jogl.jar">
+	<classpathentry kind="lib" path="/Users/vestibule/sketchbook/libraries/Java/opengl/library/jogl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/boids/processing-1.5.1/modes/java/libraries/opengl/library/linux64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/vestibule/sketchbook/libraries/Java/opengl/library/macosx"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/boids/processing-1.5.1/modes/java/libraries/opengl/library/opengl.jar"/>
+	<classpathentry kind="lib" path="/Users/vestibule/sketchbook/libraries/Java/opengl/library/opengl.jar"/>
+	<classpathentry kind="lib" path="/Users/vestibule/sketchbook/libraries/SimpleOpenNI/library/SimpleOpenNI.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/vestibule/sketchbook/libraries/SimpleOpenNI/library"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

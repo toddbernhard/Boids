@@ -1,8 +1,6 @@
 package simulation;
 import java.util.ArrayList;
 
-import boids.Fish;
-
 
 import processing.core.PVector;
 
@@ -69,23 +67,23 @@ public abstract class Boid {
 	protected PVector avoidEgdes( PVector accel ) {
 		
 		if( position.x < Set.SCREEN_EdgeWidth ) {
-			accel.x += redoRange( 1/(float)Math.pow( 1 + position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+			accel.x += redoRangeERROR( 1/(float)Math.pow( 1 + position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		else if( Set.SCREEN_Width - position.x < Set.SCREEN_EdgeWidth ) {
-			accel.x -= redoRange( 1/(float)Math.pow( 1 + Set.SCREEN_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		if( position.y < Set.SCREEN_EdgeWidth ) {
-			accel.y += redoRange( 1/(float)Math.pow( 1 + position.y, 1), 0, 1.5f*getMAX_ACCEL() ); 
+			accel.y += redoRangeERROR( 1/(float)Math.pow( 1 + position.y, 1), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		else if( Set.SCREEN_Height - position.y < Set.SCREEN_EdgeWidth ) {
-			accel.y -= redoRange( 1/(float)Math.pow( 1 + Set.SCREEN_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		return accel;
 		
 	}
-	
+	/*
 	public static void group( ArrayList<Boid> school ) {
 		
 		ArrayList<ArrayList<Boid>> groups = new ArrayList<ArrayList<Boid>>();
@@ -108,7 +106,7 @@ public abstract class Boid {
 			}
 		}
 		*/
-		
+		/*
 		for( Boid boid : school ) {
 			if( boid.grouped == false ) {
 				groups.add( new ArrayList<Boid>() );
@@ -187,9 +185,9 @@ public abstract class Boid {
 			
 			}
 		}
-		*/
+		
 	}
-	
+	*/
 	
 	protected void groupHelper( ArrayList<Boid> school, ArrayList<Boid> group ) {
 		
@@ -291,13 +289,36 @@ public abstract class Boid {
 		return answer;
 	}
 	
-	public static float redoRange( float value, float targetMin, float targetMax,
+	// ERROR because I switched targetMax w/ targetMin so in effect it maps
+	//    [ sourceMin, sourceMax ] --> [ targetMax, targetMax+Min ]
+	//                          instead of
+	//    [ sourceMin, sourceMax ] --> [ targetMin, targetMax ]
+	// Before this was discovered, enough constants had been tweaked to compensate
+	// that it was not removed.  Use redoRange for expected behavior 
+	public static float redoRangeERROR( float value, float targetMin, float targetMax,
 								   				float sourceMin, float sourceMax ) {
 		return (value-sourceMin) * ((targetMax-targetMin)/(sourceMax-sourceMin)) + targetMax;
+	}
+	
+	// ERROR because I switched targetMax w/ targetMin so in effect it maps
+	//    [ sourceMin, sourceMax ] --> [ targetMax, targetMax+Min ]
+	//                          instead of
+	//    [ sourceMin, sourceMax ] --> [ targetMin, targetMax ]
+	// Before this was discovered, enough constants had been tweaked to compensate
+	// that it was not removed.  Use redoRange for expected behavior 
+	public static float redoRangeERROR( float value, float targetMin, float targetMax ) {
+		return redoRangeERROR( value, targetMin, targetMax, 0, 1 );
+	}
+	
+	public static float redoRange( float value, float targetMin, float targetMax,
+								   				float sourceMin, float sourceMax ) {
+		if( value < sourceMin || value > sourceMax ) {
+			//System.out.printf("warning: value %f outside range [%f,%f]\n",value,sourceMin,sourceMax);
+		}
+		return (value-sourceMin) * ((targetMax-targetMin)/(sourceMax-sourceMin)) + targetMin;
 	}
 	
 	public static float redoRange( float value, float targetMin, float targetMax ) {
 		return redoRange( value, targetMin, targetMax, 0, 1 );
 	}
-
 }

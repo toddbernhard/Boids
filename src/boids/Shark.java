@@ -59,7 +59,7 @@ public class Shark extends Boid {
 		
 		if( closest != null) {
 			
-			float cyclePercent = (1 - (float) Math.pow( Math.abs( Math.cos( Boid.redoRange(
+			float cyclePercent = (1 - (float) Math.pow( Math.abs( Math.cos( Boid.redoRangeERROR(
 					(Sim.frameCounter+FRAME_OFFSET)%Set.SHARK_SpeedCycle, 0, (float) Math.PI, 0, Set.SHARK_HealthLevels ))) , .5 ));
 			
 			speed = PVector.sub( closest.position, position );

@@ -65,7 +65,7 @@ public class Obstacle extends Boid {
 			speed = PVector.sub( CENTER_VECTOR, position );
 			speed.add( (Sim.rand.nextFloat()-.5f)*Set.OBSTACLE_TargetSize, (Sim.rand.nextFloat()-.5f)*Set.OBSTACLE_TargetSize, 0);
 			speed.normalize();
-			speed.mult( Boid.redoRange( Sim.rand.nextFloat(), Set.OBSTACLE_MinSpeed, Set.OBSTACLE_MaxSpeed) );
+			speed.mult( Boid.redoRangeERROR( Sim.rand.nextFloat(), Set.OBSTACLE_MinSpeed, Set.OBSTACLE_MaxSpeed) );
 			
 			/*
 			int i = rand.nextInt(8);
