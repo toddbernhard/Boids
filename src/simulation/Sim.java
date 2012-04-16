@@ -112,6 +112,7 @@ public class Sim extends PApplet{
 		
 		stroke(155,0,0);
 		rectMode(CENTER);
+		frameRate(30);
 	}
  
 	@Override

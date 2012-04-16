@@ -1,3 +1,5 @@
 $ cat .gitignore
 bin/
+.DS_STORE
+.classpath
 
