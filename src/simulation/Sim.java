@@ -2,10 +2,15 @@ package simulation;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.lang.Math;
 
-import processing.opengl.*;
+import processing.core.*;
+import sprites.*;
+//import processing.core.PGraphics;
+//import processing.opengl.*;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 import boids.Fish;
 import boids.Food;
@@ -14,6 +19,8 @@ import boids.Person;
 import boids.Shark;
 //import boids.YellowFish;
  
+
+
 @SuppressWarnings("serial")
 public class Sim extends PApplet{
 
@@ -21,14 +28,19 @@ public class Sim extends PApplet{
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
+	//public PImage fishpic = loadImage("E:/Storage/Programs/myPrograms/Boids/images/fish.png", "png");
+	//public Animation animation1 = new Animation("E:/Storage/Programs/myPrograms/Boids/images/fish", 2);
+	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 1);
 	
 	public ArrayList<Boid> school;
 	
 	@Override
 	public void setup() {
-		
+		fishSprite.setFrameSequence(0, 24);
+		frameRate(30);
+		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
-		
+				
 		frameCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
@@ -116,7 +128,6 @@ public class Sim extends PApplet{
  
 	@Override
 	public void draw() {
-		
 		if( Set.paused == false ) {
 		
 			background(0,20,80);  // Clear screen
@@ -300,6 +311,7 @@ public class Sim extends PApplet{
 		tail[1].mult( (float) Fish.T_LENGTH );
 		*/
 		
+		/*
 		// Draw head
 		fill( fish.head_color );
 		stroke( fish.head_color );
@@ -325,7 +337,16 @@ public class Sim extends PApplet{
 		vertex( (int)(fish.position.x+head[0].x), (int)(fish.position.y+head[0].y) );
 		endShape();
 		/// END DRAW FISH
-		
+		*/
+
+		//animation1.display(fish.position.x, fish.position.y, fish.position.x, fish.position.y);
+		//image(fishpic, fish.position.x, fish.position.y);
+		float angle = atan2(fish.speed.x, fish.speed.y);
+		fishSprite.setRot(angle);
+		fishSprite.setXY(fish.position.x, fish.position.y);
+		fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
+		//fishSprite.setZorder(frameCounter%62);
+		S4P.drawSprites();
 		
 		// Draws each fish's basis vectors
 		if( Set.SHOW_Bases ) {
@@ -515,7 +536,54 @@ public class Sim extends PApplet{
 	}
 	*/
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	class Animation {
+		  PImage[] images;
+		  int imageCount;
+		  int frame;
+		  
+		  Animation(String imagePrefix, int count) {
+		    imageCount = count;
+		    images = new PImage[imageCount];
 
+		    for (int i = 0; i < imageCount; i++) {
+		      // Use nf() to number format 'i' into four digits
+		      String filename = imagePrefix + nf(i, 4) + ".png";
+		      images[i] = loadImage(filename, "png");
+		    }
+		    for (int k = 0; k < imageCount; k++)
+		    {
+		    	images[k].resize(20, 20);
+		    }
+		  }
+
+		  void display(float xpos, float ypos, float xvel, float yvel) {
+			if(ypos>xpos ||(-xpos>ypos))
+			{
+				frame= 1;
+			}
+			else
+			{
+				frame=0;
+			}
+		    //frame = (frame+1) % imageCount;
+			  image(images[frame], xpos, ypos);
+		  }
+		  
+		  int getWidth() {
+		    return images[0].width;
+		  }
+		}
+*/
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);
 
