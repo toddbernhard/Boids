@@ -6,6 +6,9 @@ import java.util.Random;
 import kinect.Kinect;
 import kinect.KinectConfig;
 
+import processing.opengl.*;
+import javax.media.opengl.*;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 import boids.Fish;
