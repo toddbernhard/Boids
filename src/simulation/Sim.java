@@ -25,23 +25,28 @@ import boids.Shark;
 public class Sim extends PApplet{
 
 	public static int frameCounter;  // Used for animation and color cycles
+	public static int animCounter;
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
 	//public PImage fishpic = loadImage("E:/Storage/Programs/myPrograms/Boids/images/fish.png", "png");
 	//public Animation animation1 = new Animation("E:/Storage/Programs/myPrograms/Boids/images/fish", 2);
-	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 1);
+	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 0);
 	
 	public ArrayList<Boid> school;
 	
 	@Override
 	public void setup() {
 		fishSprite.setFrameSequence(0, 24);
+		fishSprite.setAnimInterval(.05);
+		float scale = (float)0.5;
+		fishSprite.setScale(scale);
 		frameRate(30);
 		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 				
 		frameCounter = 0;
+		animCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
@@ -151,6 +156,7 @@ public class Sim extends PApplet{
 			}
 		
 			frameCounter++;
+			animCounter = frameCounter/3;
 		
 		}
 		// else
@@ -338,13 +344,28 @@ public class Sim extends PApplet{
 		endShape();
 		/// END DRAW FISH
 		*/
-
+		rand = new Random();
 		//animation1.display(fish.position.x, fish.position.y, fish.position.x, fish.position.y);
 		//image(fishpic, fish.position.x, fish.position.y);
 		float angle = atan2(fish.speed.x, fish.speed.y);
 		fishSprite.setRot(angle);
 		fishSprite.setXY(fish.position.x, fish.position.y);
-		fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
+		//fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
+		double totalAccel = Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y));
+		System.out.print(Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y) )+"\n");
+		
+		if(totalAccel < 1)
+		{
+			fishSprite.setFrame(animCounter/2 % 5);
+		}
+		else if(totalAccel < 2)
+		{
+			fishSprite.setFrame(animCounter % 5);
+		}
+		else
+		{
+			fishSprite.setFrame(frameCounter % 5);
+		}
 		//fishSprite.setZorder(frameCounter%62);
 		S4P.drawSprites();
 		

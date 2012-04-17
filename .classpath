@@ -14,6 +14,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="E:/Windows/Program Files (x86)/Processing/processing-1.5.1/modes/java/libraries/opengl/library/opengl.jar"/>
-	<classpathentry kind="lib" path="E:/Storage/Programs/libraries/spritesProcessing/library/sprites.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
