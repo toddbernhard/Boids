@@ -28,6 +28,12 @@ public class Sim extends PApplet{
 	
 	private int[][] pointCloud;
 	
+	String vertexSource;
+	String fragmentSource;
+	
+	int shaderProgram;
+	float time;
+	
 	@Override
 	public void setup() {
 		
@@ -42,6 +48,49 @@ public class Sim extends PApplet{
 			kinect = new Kinect(this,Kinect.MOTION_DETECTION);
 			kinect.init();
 		}
+		
+		try {
+			vertexSource = readFileAsString(Set.vertexShaderSourceLocation);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fragmentSource = readFileAsString(Set.fragmentShaderSourceLocation);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// set up the shader
+		PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;
+		GL gl = pgl.beginGL();
+		
+		// compiled shader handles
+		int vert = gl.glCreateShader(gl.GL_VERTEX_SHADER);
+		int frag = gl.glCreateShader(gl.GL_FRAGMENT_SHADER);
+		
+		String[] vs = new String[1];
+		vs[0] = vertexSource;
+		
+		String[] fs = new String[1];
+		fs[0] = fragmentSource;
+		
+		gl.glShaderSource(vert, 1, vs, (IntBuffer)null);
+		gl.glCompileShader(vert);
+		
+		gl.glShaderSource(frag, 1, fs, (IntBuffer)null);
+		gl.glCompileShader(frag);
+		
+		shaderProgram = gl.glCreateProgram();
+		gl.glAttachShader(shaderProgram, vert);
+		gl.glAttachShader(shaderProgram, frag);
+		gl.glLinkProgram(shaderProgram);
+		gl.glValidateProgram(shaderProgram);
+		
+		// something to keep track of time
+		// use timeIncrement in Set to control how fast this increases
+		time = 0;
 			
 		// Create new fish with random position in screen and random speed
 		for( int i=0;
@@ -182,6 +231,30 @@ public class Sim extends PApplet{
 					}
 				}				
 			}
+		
+		time += Set.timeIncrement;
+		
+		 PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;  
+		 GL gl = pgl.beginGL(); 
+		 
+		 gl.glUseProgram(shaderProgram);
+		 int loc = gl.glGetUniformLocation(shaderProgram, "screen");
+		 gl.glUniform1f(loc, Set.SCREEN_Width/Set.SCREEN_Height);
+		 
+		 loc = gl.glGetUniformLocation(shaderProgram, "time");
+		 gl.glUniform1f(loc, time);
+		 
+		 gl.glColor3f(1, 1, 1);
+		 gl.glBegin(gl.GL_POLYGON);
+		 gl.glVertex3f(-Set.SCREEN_Width, -Set.SCREEN_Height, -1);
+		 gl.glVertex3f(Set.SCREEN_Width, -Set.SCREEN_Height, -1);
+		 gl.glVertex3f(Set.SCREEN_Width, Set.SCREEN_Height, -1);
+		 gl.glVertex3f(-Set.SCREEN_Width, Set.SCREEN_Height, -1);
+		 gl.glEnd();
+		 
+		 gl.glUseProgram(0);
+		  
+		 pgl.endGL();
 		// else
 	
 	}

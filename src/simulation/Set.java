@@ -9,6 +9,13 @@ public class Set {
 	// TODO why is this here? where is it from
 	//	public static final int AVOID_RADIUS = 10;
 	
+	// this controls the speed of the water in the background
+	// bigger = faster
+	public static final float timeIncrement = (float)0.02;
+	
+	public static final String vertexShaderSourceLocation = "/home/dane/Desktop/warping.vert";
+	public static final String fragmentShaderSourceLocation = "/home/dane/Desktop/warping_water.frag";
+	
 						   // Format =    [ Scrn W, Scrn H, Edge ]
 	public static final int[][] screen =  {{  800,     600,   50 },
 										   {  800,    600,    50 },
