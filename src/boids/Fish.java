@@ -23,7 +23,7 @@ public class Fish extends Boid implements Aware, Flockable {
 	
 	public static final float MAX_TURN_RATIO = (float) Math.tan( Math.toRadians(Set.FISH_MaxTurnAngle) );
 
-	private static Integer[] COLOR_OFFSETS = { null, null, null, null };
+	public static Integer[] COLOR_OFFSETS = { null, null, null, null };
 
 	
 	private final int FRAME_OFFSET;

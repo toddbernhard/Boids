@@ -1,6 +1,5 @@
 package kinect;
 
-import java.util.ArrayList;
 
 import processing.core.PConstants;
 
@@ -9,16 +8,13 @@ public class KinectConfig {
 	public static final int MODE_Normal		 	= 0;
 	public static final int MODE_StdDevAdjust	= 1;
 	public static final int MODE_RangeAdjust	= 2;
-	public static final int MODE_AlphaAdjust 	= 3;
 	public static final int MODE_Test			= 4;
 	
 	public int mode;
-	public float stdDevThreshold;
 	public int range;
 	public int rangeSize;
-	public int rangeAlpha;
 	public boolean rangeBg;
-	public ArrayList<Float> stdDevs;
+	public RunningStat[] stats;
 	
 	private Kinect kinect;
 	
@@ -26,16 +22,13 @@ public class KinectConfig {
 		this.kinect = kinect;
 		reset();
 		
-		stdDevs = new ArrayList<Float>();
 	}
 	
 	public void reset() {
 		mode = 0;
 		kinect.filter = false;
-		stdDevThreshold = 70;
-		range = -1000;
-		rangeSize = 800;
-		rangeAlpha = 150;
+		range = -4400;
+		rangeSize = 4000;
 		rangeBg = false;
 	}
 
@@ -44,31 +37,23 @@ public class KinectConfig {
 		if(keyCode == PConstants.UP) {
 			
 			if(mode == MODE_StdDevAdjust) {
-				stdDevThreshold *= 1.5;
-				System.out.printf("std-dev=%f\n", stdDevThreshold);
+				kinect.filterThreshold *= 1.5;
+				System.out.printf("std-dev=%f\n", kinect.filterThreshold);
 			}
 			if(mode == MODE_RangeAdjust) {
-				range += rangeSize/2;
+				range += rangeSize/4;
 				System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
-			}
-			if(mode == MODE_AlphaAdjust) {
-				rangeAlpha += 20;
-				System.out.printf("alpha=%d", rangeAlpha);
 			}
 			
 		} else if(keyCode == PConstants.DOWN) {
 			
 			if(mode == MODE_StdDevAdjust) {
-				stdDevThreshold /= 1.5;
-				System.out.printf("std-dev=%f\n", stdDevThreshold);
+				kinect.filterThreshold /= 1.5;
+				System.out.printf("std-dev=%f\n", kinect.filterThreshold);
 			}
 			if(mode == MODE_RangeAdjust) {
-				range -= rangeSize/2;
+				range -= rangeSize/4;
 				System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
-			}
-			if(mode == MODE_AlphaAdjust) {
-				rangeAlpha -= 20;
-				System.out.printf("alpha=%d", rangeAlpha);
 			}
 			
 		} else if(keyCode == PConstants.RIGHT) {
@@ -104,7 +89,7 @@ public class KinectConfig {
 			case '4':
 				kinect.filter = !kinect.filter;
 				System.out.println( kinect.filter ? "Filter=ON" : "Filter=OFF" );
-				kinect.refreshGoodPixels();
+				kinect.refreshGoodPixels(stats);
 				break;
 			case '6':
 			case 't':
@@ -126,11 +111,6 @@ public class KinectConfig {
 				mode = MODE_RangeAdjust;
 				System.out.println("Range Adjust");
 				break;
-			case 'a':
-			case 'A':
-				mode = MODE_AlphaAdjust;
-				System.out.println("Alpha Adjust");
-				break;
 			case '+':
 			case '=':
 				if( mode == MODE_RangeAdjust ) {
@@ -142,6 +122,7 @@ public class KinectConfig {
 			case '_':
 				if( mode == MODE_RangeAdjust ) {
 					rangeSize /= 1.5;
+					if( rangeSize < 5 ) rangeSize = 5;
 					System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
 				}
 				break;
