@@ -1,13 +1,21 @@
 package simulation;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
+
+import javax.media.opengl.GL;
 
 import kinect.Kinect;
 import kinect.KinectConfig;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+import processing.opengl.PGraphicsOpenGL;
 import boids.Fish;
 import boids.Food;
 import boids.Obstacle;
@@ -38,6 +46,7 @@ public class Sim extends PApplet{
 	public void setup() {
 		
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
+		colorMode(RGB, 255);
 		
 		frameCounter = 0;
 		rand = new Random();
@@ -155,9 +164,9 @@ public class Sim extends PApplet{
 			background(0, 20, 80); // Clear screen
 			
 			for (int i = 0; i < kinect.goodPixels.length; i++) {
-				if( kinect.config.stdDevs.get(kinect.goodPixels[i]) > kinect.config.stdDevThreshold ) {
+				if( kinect.config.stats[kinect.goodPixels[i]].getStdDev() > kinect.filterThreshold ) {
 					stroke(255);
-					point(Boid.redoRange(kinect.goodPixels[i]%640,0,800,0,640), Boid.redoRange(kinect.goodPixels[i]/640,0,600,0,480));
+					point(kinect.mapToSimC[kinect.goodPixels[i]%640], kinect.mapToSimR[kinect.goodPixels[i]/640]);
 				}
 			}
 		}
@@ -201,37 +210,31 @@ public class Sim extends PApplet{
 					}
 				}
 
+				int temp;
 				if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust ) {
-					for (int i = 0; i < kinect.goodPixels.length; i++) {
+										
+					for(int i = 0; i < kinect.goodPixels.length; i++) {
 						
-						if( kinect.diffMap[kinect.goodPixels[i]] < kinect.config.range ) {
-							stroke(0,255,0,kinect.config.rangeAlpha);
-						}
-						else if( kinect.diffMap[kinect.goodPixels[i]] > kinect.config.range+kinect.config.rangeSize ) {
-							if( kinect.config.rangeBg ) {
-								stroke(255,0,0,kinect.config.rangeAlpha);
-							} else {
-								continue;
-							}
-						}
-						else if( kinect.diffMap[kinect.goodPixels[i]] > kinect.config.range+(kinect.config.rangeSize/2) ) {
-							stroke( Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 0,100, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 0,255, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 255,100, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									kinect.config.rangeAlpha);
-						} else { //if( kinect.diffMap[i] > kinect.config.range+(kinect.config.rangeSize/2) ) {
-							stroke( Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 100,255, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 100,0, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									Boid.redoRange(kinect.diffMap[kinect.goodPixels[i]], 255,200, kinect.config.range, kinect.config.range+kinect.config.rangeSize),
-									kinect.config.rangeAlpha);
-						}
+						if( !kinect.config.rangeBg && (kinect.diffMap[kinect.goodPixels[i]] < kinect.config.range ||
+													  kinect.diffMap[kinect.goodPixels[i]] > kinect.config.range+kinect.config.rangeSize) )
+						{ continue; }
+						else {
+							temp = (int)Boid.redoRange( kinect.depthMap[kinect.goodPixels[i]],
+														0, Kinect.NUM_COLORS, 0, 2500);
+							if( temp < 0) {  temp = 0; }
+							else if( temp >= Kinect.NUM_COLORS ) { temp = Kinect.NUM_COLORS-1; }
+							
+							stroke( colors.get(Kinect.COLOR_OFFSET+temp) );
 						
-						point(Boid.redoRange(kinect.goodPixels[i] % 640, 0, 800, 0, 640),
-								Boid.redoRange(kinect.goodPixels[i] / 640, 0, 600, 0, 480));
+						
+							point( kinect.mapToSimC[kinect.goodPixels[i]%640],
+								kinect.mapToSimR[kinect.goodPixels[i]/640]);
+						}
 					}
 				}				
 			}
 		
+		/*
 		time += Set.timeIncrement;
 		
 		 PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;  
@@ -255,8 +258,14 @@ public class Sim extends PApplet{
 		 gl.glUseProgram(0);
 		  
 		 pgl.endGL();
+		*/
 		// else
-	
+		for(int i=0; i<Set.SCREEN_Width; i++) {
+			stroke( colors.get(Kinect.COLOR_OFFSET+(int)Boid.redoRange(i, 0,Kinect.NUM_COLORS, 0, Set.SCREEN_Width)) );
+			line(i,Set.SCREEN_Height-10,i,Set.SCREEN_Height);
+		}
+		
+
 	}
 	
 	/*
@@ -638,6 +647,17 @@ public class Sim extends PApplet{
 	}
 	*/
 	
+	private static String readFileAsString(String filePath) throws java.io.IOException{
+	    byte[] buffer = new byte[(int) new File(filePath).length()];
+	    BufferedInputStream f = null;
+	    try {
+	        f = new BufferedInputStream(new FileInputStream(filePath));
+	        f.read(buffer);
+	    } finally {
+	        if (f != null) try { f.close(); } catch (IOException ignored) { }
+	    }
+	    return new String(buffer);
+	}
 
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);

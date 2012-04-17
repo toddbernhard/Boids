@@ -11,10 +11,10 @@ public class Set {
 	
 	// this controls the speed of the water in the background
 	// bigger = faster
-	public static final float timeIncrement = (float)0.02;
+	public static final float timeIncrement = (float)0.002;
 	
-	public static final String vertexShaderSourceLocation = "/home/dane/Desktop/warping.vert";
-	public static final String fragmentShaderSourceLocation = "/home/dane/Desktop/warping_water.frag";
+	public static final String vertexShaderSourceLocation = "/Users/vestibule/java_workspace/Boids/warping.vert";
+	public static final String fragmentShaderSourceLocation = "/Users/vestibule/java_workspace/Boids/warping_water.frag";
 	
 						   // Format =    [ Scrn W, Scrn H, Edge ]
 	public static final int[][] screen =  {{  800,     600,   50 },
@@ -23,11 +23,12 @@ public class Set {
 										   {  800,    600,    50 },
 										   {  800,    600,    50 }};
 	
-	public static final boolean[][] kinect = {{ false, false },
-											  { false, false },
-											  { false, false },
-											  { false, false },
-											  { true,  true  }};
+							// Format =     [ On, Render, SetupMode ]
+	public static final boolean[][] kinect = {{ false, false, false },
+											  { false, false, false },
+											  { false, false, false },
+											  { false, false, false },
+											  { true,  true , true  }};
 	
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget
 	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false },
@@ -51,11 +52,16 @@ public class Set {
 	public static final int SCREEN_FrameRate =		30; // Maximum framerate
 	
 	
-	public static final boolean KINECT_On 			= true;
-	public static final int KINECT_CalibrationLevel = 1000;	// Calibration sample size
-	public static final int KINECT_FrameRatio		= 2;	// # of frames per Kinect update
-	public static final boolean KINECT_FancyStart	= false; // BROKEN 
-	public static final boolean KINECT_SetupMode	= (KINECT_On && true);
+	public static final boolean KINECT_On 				= kinect[config_n][0]; // Global on/off
+	public static final boolean KINECT_SetupMode		= (KINECT_On && kinect[config_n][2]); // Let's you play with the parameters
+	public static final boolean KINECT_Render			= KINECT_On && (KINECT_SetupMode || kinect[config_n][1]); // Render the kinect in simulation
+	
+	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
+	public static final int		KINECT_FrameRatio		= 2;	// # of frames per Kinect update
+	public static final int[][] KINECT_DepthMapCoord	= {{ 0, 0 },
+														  { SCREEN_Width, SCREEN_Width }}; // {x1,y1} {x2,y2}
+	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
+	public static final boolean KINECT_FancyStart		= false; // BROKEN
 	
 	public static final boolean SHOW_Bases =            display_toggles[config_n][0]; // Local coordinate system for each fish
 	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel

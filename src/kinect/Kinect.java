@@ -2,30 +2,67 @@ package kinect;
 
 import java.util.ArrayList;
 
+import com.sun.tools.example.debug.bdi.SpecErrorEvent;
+
 import processing.core.PApplet;
+import quicktime.app.spaces.Space;
+import simulation.Boid;
 import simulation.Set;
+import simulation.Sim;
 import SimpleOpenNI.SimpleOpenNI;
 
 public class Kinect {
 	
-	public static int MOTION_DETECTION = 1;
+	public static final int MOTION_DETECTION = 1;
 	
-	public SimpleOpenNI  context;
-	public int[] diffMap; // current difference btw real and scene
-	public int[] staticScene; // picture of the empty scene
-	public int[] goodPixels;
-	public boolean filter = true;
-	public KinectConfig config;
+	public static int COLOR_OFFSET;
+	public static int NUM_COLORS;
 	
-	public Kinect(PApplet applet, int mode)
+	public static final int[][] SPECTRUM = {{ 255,255,255 },
+											{ 100,253,253 },
+											{   2,  2,253 },
+											{ 253,  2,253 },
+											{ 253,  2,  2 },
+											{ 253,253,  2 },
+											{   2,253,  2 }};
+	
+	public SimpleOpenNI  context; // SimpleOpenNI handle
+	
+	public int[] depthMap;    // last frame
+	public int[] diffMap;     // difference btw last frame and scene
+	public int[] staticScene; // avgs of each pixel from sample. picture of the empty scene
+	
+	public int[] goodPixels;  // pixels to use in simulation (with or without filters applied)
+	public boolean filter = true; // filter out pixels w/ high stddev
+	public float filterThreshold = Set.KINECT_DefaultFilter; // filters out pixels w/ a stddev > threshold;
+	
+	public int[] mapToSimC = new int[640]; // each col of Kinect depth image corresponds to a col of Sim screen
+	public int[] mapToSimR = new int[480]; //  "   row        "            "       "          row     "
+	
+	public KinectConfig config; // handle for KinectConfig, if in Setup mode
+	
+	public int alphaChannel = 200;
+	
+	
+	
+	public Kinect(Sim simul, int mode)
 	{
 		// If we'll need a config, create one
 		if( Set.KINECT_SetupMode ) {
 			config = new KinectConfig(this);
 		}
 		
+		// If we have to render, register our colors
+		if( Set.KINECT_Render ) {
+			NUM_COLORS = (SPECTRUM.length-1)*256+1;
+			COLOR_OFFSET = simul.registerColors( createColors() );
+		}
+		
+		// generate lookup arrays mapToSimC and mapToSimR
+		mapDepthToSim();
+		
 		// SimpleOpenNI handle
-		context = new SimpleOpenNI(applet,SimpleOpenNI.RUN_MODE_MULTI_THREADED);
+		context = new SimpleOpenNI(simul,SimpleOpenNI.RUN_MODE_MULTI_THREADED);
 	 
 		// enable depthMap generation 
 		context.enableDepth();
@@ -43,12 +80,13 @@ public class Kinect {
 		
 		//Fetch data once
 		context.update();
-		diffMap = context.depthMap();
+		depthMap = context.depthMap();
+		diffMap = new int[depthMap.length];
 		
 		//Get ready for the rest
 		int perc10 = Set.KINECT_CalibrationLevel/10;
-		RunningStat[] stats = new RunningStat[diffMap.length];
-		for(int j=0; j<diffMap.length; j++) {
+		RunningStat[] stats = new RunningStat[depthMap.length];
+		for(int j=0; j<depthMap.length; j++) {
 			stats[j] = new RunningStat();
 		}
 		
@@ -60,57 +98,28 @@ public class Kinect {
 			
 			//Fetch data
 			context.update();
-			diffMap = context.depthMap();
+			depthMap = context.depthMap();
 			
 			//Add it up
-			for (int j = 0; j < diffMap.length; j++) {
-				stats[j].addSample( diffMap[j] );
+			for (int j = 0; j < depthMap.length; j++) {
+				stats[j].addSample( depthMap[j] );
 			}
 			
 		}
 		
 		//If we're in config mode, save the data
 		if( config != null ) {
-			for (int j = 0; j < diffMap.length; j++) {
-				config.stdDevs.add( (float) stats[j].getStdDev() );
-			}
+			config.stats = stats;
 		}
 		
 		//Save the scene
-		for (int j = 0; j < diffMap.length; j++) {
+		for (int j = 0; j < depthMap.length; j++) {
 			staticScene[j] = (int) stats[j].getMean();
 		}
 		
-		refreshGoodPixels();
+		refreshGoodPixels(stats);
 		
 		System.out.println("\nCalibration DONE!");
-		
-	}
-
-	public void refreshGoodPixels() {
-		
-		if( Set.KINECT_SetupMode && filter ) {
-			ArrayList<Integer> stack = new ArrayList<Integer>();
-			
-			for(int i=0; i<diffMap.length; i++) {
-				if( config.stdDevs.get(i) <= config.stdDevThreshold ) {
-					stack.add(i);
-				}
-			}
-			goodPixels = new int[stack.size()];
-			Object[] Ostack = stack.toArray();
-			for(int i=0; i<goodPixels.length; i++) {
-				goodPixels[i] = (Integer) Ostack[i];
-			}
-		}
-		
-		else {
-			
-			goodPixels = new int[diffMap.length];
-			for(int i=0; i<diffMap.length; i++) {
-				goodPixels[i] = i;
-			}
-		}
 		
 	}
 	
@@ -118,55 +127,96 @@ public class Kinect {
 	 * 
 	 */
 	public void generatePointCloud(int interval) {
-		
-		
-		
-	}
-
-	/*
-	 * BROKEN
-	 */
-	public void initFancy(int count) {
-		
-		// Print start message
-		if( count == 0 ) {
-			System.out.println("calibrating kinect...");
-		}
-		
-		// Print % msgs
-		int perc10 = Set.KINECT_CalibrationLevel/10;
-		if( count%perc10 == 0) {
-			System.out.printf("%d",count/perc10);
-		}
-		
-		//Fetch data
-		context.update();
-		diffMap = context.depthMap();
-
-		// add a bit of this frame to scene total to create an average
-		for (int j = 0; j < diffMap.length; j++) {
-			staticScene[j] += diffMap[j];
-		}
-		
-		// Finish up
-		if( count == Set.KINECT_CalibrationLevel ) {
-			for (int j = 0; j < diffMap.length; j++) {
-				staticScene[j] /= Set.KINECT_CalibrationLevel;
-			}
-			// Print exit
-			System.out.println("\nCalibration DONE!");
-		}
-		
+		ArrayList<Integer> points = new ArrayList<Integer>();
 	}
 	
 	public void update()
 	{
 		// update the cam;
 		context.update();
-		diffMap = context.depthMap();
-		for(int i=0; i<diffMap.length; i++) {
-			diffMap[i] -= staticScene[i];
+		depthMap = context.depthMap();
+		for(int i=0; i<goodPixels.length; i++) {
+			diffMap[goodPixels[i]] = depthMap[goodPixels[i]] - staticScene[goodPixels[i]];
 		}
   
+	}
+	
+	
+	protected void refreshGoodPixels(RunningStat[] stats) {
+		// protected so KinectConfig can call
+		
+		if( filter ) {
+			if (Set.KINECT_SetupMode) {
+				ArrayList<Integer> stack = new ArrayList<Integer>();
+
+				for (int i = 0; i < depthMap.length; i++) {
+					if (stats[i].getStdDev() <= filterThreshold) {
+						stack.add(i);
+					}
+				}
+				goodPixels = new int[stack.size()];
+				Object[] Ostack = stack.toArray();
+				for (int i = 0; i < goodPixels.length; i++) {
+					goodPixels[i] = (Integer) Ostack[i];
+				}
+			}
+			else // just filtering once
+			{
+				
+			}
+		}
+		
+		else {
+			
+			goodPixels = new int[depthMap.length];
+			for(int i=0; i<depthMap.length; i++) {
+				goodPixels[i] = i;
+			}
+		}
+		
+	}
+	
+	
+	/*
+	 * Creates the map of the Kinect's depthMap pixels to the Simulation's pixels
+	 * and populates mapToSimR (with the row indices) and mapToSimC (with the
+	 * column indices)
+	 */
+	private void mapDepthToSim() {
+	
+		if( Set.KINECT_DepthMapCoord[1][0] - Set.KINECT_DepthMapCoord[0][0] < 640 ||
+			Set.KINECT_DepthMapCoord[1][1] - Set.KINECT_DepthMapCoord[0][1] < 480 ) {
+			System.out.printf("warning: compressing depth image to %dx%d" +
+					" (orig. 640x480). unsupported size",
+					Set.KINECT_DepthMapCoord[1][0] - Set.KINECT_DepthMapCoord[0][0],
+					Set.KINECT_DepthMapCoord[1][1] - Set.KINECT_DepthMapCoord[0][1]);
+		}
+		
+		for(int i=0; i<640; i++) {
+			mapToSimC[i] = (int) Boid.redoRange(i, Set.KINECT_DepthMapCoord[0][0], Set.KINECT_DepthMapCoord[1][0], 0, 640);
+		}
+		
+		for(int i=0; i<480; i++) {
+			mapToSimR[i] = (int) Boid.redoRange(i, Set.KINECT_DepthMapCoord[0][1], Set.KINECT_DepthMapCoord[1][1], 0, 480);
+		}
+	}
+	
+	private int[][] createColors() {
+		
+		int[][] colors = new int[NUM_COLORS][4];
+		
+		int i,j, k = 0;
+		for( i=0; i<SPECTRUM.length-1; i++ ) {
+			//colors[i] = new int[4];
+			for( j=0; j<256; j++ ) {
+				colors[k][0] = (int) Boid.redoRange(j, SPECTRUM[i][0],SPECTRUM[i+1][0], 0,255);
+				colors[k][1] = (int) Boid.redoRange(j, SPECTRUM[i][1],SPECTRUM[i+1][1], 0,255);
+				colors[k][2] = (int) Boid.redoRange(j, SPECTRUM[i][2],SPECTRUM[i+1][2], 0,255);
+				colors[k][3] = alphaChannel;
+				
+				k++;
+			}
+		}
+		return colors;
 	}
 }
