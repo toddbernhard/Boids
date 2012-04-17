@@ -5,8 +5,8 @@ import java.util.Random;
 
 import kinect.Kinect;
 import kinect.KinectConfig;
-
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 import boids.Fish;
 import boids.Food;
@@ -565,6 +565,15 @@ public class Sim extends PApplet{
 	}
 	*/
 	
+	public ArrayList<PImage> loadSprites(String pathFormatString, int numberOfSprites) {
+		ArrayList<PImage> sprites = new ArrayList<PImage>();
+		
+		for(int i=1; i<=numberOfSprites; i++) {
+			sprites.add((PImage) loadImage(String.format(pathFormatString, i)));
+		}
+		
+		return sprites;
+	}
 
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);
