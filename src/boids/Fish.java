@@ -1,21 +1,20 @@
 package boids;
 
-import processing.core.*;
 import interfaces.Aware;
 import interfaces.Flockable;
+import interfaces.HasSprites;
 
 import java.util.ArrayList;
 
 import kinect.Kinect;
 
-import processing.core.PApplet;
 import processing.core.PVector;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;
 
 
-public class Fish extends Boid implements Aware, Flockable {
+public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		
 	public static final Boid.Type TYPE = Boid.Type.FISH;
 	

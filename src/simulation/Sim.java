@@ -1,5 +1,6 @@
 package simulation;
 
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,8 +8,6 @@ import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
-import java.lang.Math;
-
 
 import processing.core.*;
 import processing.opengl.*;
@@ -26,42 +25,43 @@ public class Sim extends PApplet{
 
 	public static int frameCounter; // Used for animation and color cycles.
 									// Shadows p5's frameCount, but is public
-	public static int animCounter;
+	
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
-	//public PImage fishpic = loadImage("E:/Storage/Programs/myPrograms/Boids/images/fish.png", "png");
-	//public Animation animation1 = new Animation("E:/Storage/Programs/myPrograms/Boids/images/fish", 2);
-	public Sprite fishSprite = new Sprite(this, "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png", 7, 5, 0);
+	
+	// TODO make this more dynamic, put in settings too
+	public Sprite fishSprite;
 	
 	public ArrayList<Boid> school;
 
-	public static Kinect kinect;
+	public static Kinect kinect; // kinect handle
 
-	private int[][] pointCloud;
-
+	// OpenGL shader stuff
 	String vertexSource;
 	String fragmentSource;
-
 	int shaderProgram;
 	float time;
 
 	@Override
 	public void setup() {
-		fishSprite.setFrameSequence(0, 24);
-		fishSprite.setAnimInterval(.05);
-		float scale = (float)0.5;
-		fishSprite.setScale(scale);
 		frameRate(30);
 		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 				
 		frameCounter = 0;
-		animCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 
+		if( Set.SHOW_Sprites ) {
+			fishSprite = new Sprite(this, "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png", 7, 5, 0);
+			fishSprite.setFrameSequence(0, 24);
+			fishSprite.setAnimInterval(.05);
+			float scale = (float)0.5;
+			fishSprite.setScale(scale);
+		}
+		
 		if (Set.KINECT_On) {
 			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
 			kinect.init();
@@ -248,7 +248,6 @@ public class Sim extends PApplet{
 		}
 
 		frameCounter++;
-		animCounter = frameCounter/3;
 
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
@@ -358,6 +357,7 @@ public class Sim extends PApplet{
 	 */
 	private void drawFish(Fish fish) {
 
+		//============DISPLAY EXTRAS============
 		// We draw the awareness circle first so it is under the fish
 		if (Set.SHOW_Awareness) {
 			stroke(255, 0, 0);
@@ -387,40 +387,65 @@ public class Sim extends PApplet{
 			endShape();
 		}
 
-		// / DRAW FISH
-		// head are the three points that define the head
-		PVector head[] = {
-				new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
-						+ PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
-						.getHeading() + PI / 2))),
-				new PVector(
-						(float) (fish.H_LENGTH * Math.cos(fish.getHeading())),
-						(float) (fish.H_LENGTH * Math.sin(fish.getHeading()))),
-				new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
-						- PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
-						.getHeading() - PI / 2))) };
+		//=========DRAW FISH===========
+		if( Set.SHOW_Sprites ) {
+			// Code to animate sprites
+			
+			float angle = atan2(fish.speed.x, fish.speed.y);
+			fishSprite.setRot(angle);
+			fishSprite.setXY(fish.position.x, fish.position.y);
+			float totalAccel = fish.recentAccel.mag();
+			
+			if(totalAccel < 1)
+			{
+				fishSprite.setFrame(frameCounter/6 % 5);
+			}
+			else if(totalAccel < 2)
+			{
+				fishSprite.setFrame(frameCounter/3 % 5);
+			}
+			else
+			{
+				fishSprite.setFrame(frameCounter % 5);
+			}
+			//fishSprite.setZorder(frameCounter%62);
+			S4P.drawSprites();
+		
+		} else {
+			// Code to draw the fish from scratch
+			
+			// head are the three points that define the head
+			PVector head[] = {
+					new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
+							+ PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
+									.getHeading() + PI / 2))),
+					new PVector(
+							(float) (fish.H_LENGTH * Math.cos(fish.getHeading())),
+							(float) (fish.H_LENGTH * Math.sin(fish.getHeading()))),
+					new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
+							- PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
+									.getHeading() - PI / 2))) };
 
-		// Scales the width of head inversely and length directly with %speed
+			
+			// Scales the width of head inversely and length directly with %speed
+			float fracSpeed = (float) fish.speed.mag() / fish.getMAX_SPEED();
 
-		float fracSpeed = (float) fish.speed.mag() / fish.getMAX_SPEED();
+			if (fish.speed.mag() > 1) {
+				head[0].mult(1.1f - .3f * fracSpeed);
+				head[1].mult(.9f + .5f * fracSpeed);
+				head[2].mult(1.1f - .3f * fracSpeed);
+			}
 
-		if (fish.speed.mag() > 1) {
-			head[0].mult(1.1f - .3f * fracSpeed);
-			head[1].mult(.9f + .5f * fracSpeed);
-			head[2].mult(1.1f - .3f * fracSpeed);
-		}
-
-		// tail are the two points that define the tail
-
-		PVector tail[] = {
-				new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
-						+ PI / 2 + fish.T_ANGLE)),
-						(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
-								+ PI / 2 + fish.T_ANGLE))),
-				new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
-						- PI / 2 - fish.T_ANGLE)),
-						(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
-								- PI / 2 - fish.T_ANGLE))) };
+			// tail are the two points that define the tail
+			PVector tail[] = {
+					new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
+										+ PI / 2 + fish.T_ANGLE)),
+								(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
+										+ PI / 2 + fish.T_ANGLE))),
+					new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
+										- PI / 2 - fish.T_ANGLE)),
+								(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
+										- PI / 2 - fish.T_ANGLE))) };
 
 		/*
 		 * PVector accel = fish.recentAccel;
@@ -441,67 +466,45 @@ public class Sim extends PApplet{
 		 * Fish.T_LENGTH ); tail[1].mult( (float) Fish.T_LENGTH );
 		 */
 
-		/*
-		// Draw head
-		fill(fish.head_color);
-		stroke(fish.head_color);
-
-		// Connect the dots
-		beginShape();
-		vertex((int) (fish.position.x + head[0].x),
-				(int) (fish.position.y + head[0].y));
-		vertex((int) (fish.position.x + head[1].x),
-				(int) (fish.position.y + head[1].y));
-		vertex((int) (fish.position.x + head[2].x),
-				(int) (fish.position.y + head[2].y));
-		vertex((int) (fish.position.x + head[0].x),
-				(int) (fish.position.y + head[0].y));
-		endShape();
-
-		// Draw body
-		fill(fish.color);
-		stroke(fish.color);
-
-		// Connect the dots
-		beginShape();
-		vertex((int) (fish.position.x + head[0].x),
-				(int) (fish.position.y + head[0].y));
-		vertex((int) (fish.position.x + head[2].x),
-				(int) (fish.position.y + head[2].y));
-		vertex((int) (fish.position.x + tail[0].x),
-				(int) (fish.position.y + tail[0].y));
-		vertex((int) (fish.position.x + tail[1].x),
-				(int) (fish.position.y + tail[1].y));
-		vertex((int) (fish.position.x + head[0].x),
-				(int) (fish.position.y + head[0].y));
-		endShape();
-		/// END DRAW FISH
-		*/
-		rand = new Random();
-		//animation1.display(fish.position.x, fish.position.y, fish.position.x, fish.position.y);
-		//image(fishpic, fish.position.x, fish.position.y);
-		float angle = atan2(fish.speed.x, fish.speed.y);
-		fishSprite.setRot(angle);
-		fishSprite.setXY(fish.position.x, fish.position.y);
-		//fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
-		double totalAccel = Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y));
-		System.out.print(Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y) )+"\n");
 		
-		if(totalAccel < 1)
-		{
-			fishSprite.setFrame(animCounter/2 % 5);
+			// Draw head
+			fill(fish.head_color);
+			stroke(fish.head_color);
+
+			// Connect the dots
+			beginShape();
+			vertex((int) (fish.position.x + head[0].x),
+					(int) (fish.position.y + head[0].y));
+			vertex((int) (fish.position.x + head[1].x),
+					(int) (fish.position.y + head[1].y));
+			vertex((int) (fish.position.x + head[2].x),
+					(int) (fish.position.y + head[2].y));
+			vertex((int) (fish.position.x + head[0].x),
+					(int) (fish.position.y + head[0].y));
+			endShape();
+
+			// Draw body
+			fill(fish.color);
+			stroke(fish.color);
+
+			// Connect the dots
+			beginShape();
+			vertex((int) (fish.position.x + head[0].x),
+					(int) (fish.position.y + head[0].y));
+			vertex((int) (fish.position.x + head[2].x),
+					(int) (fish.position.y + head[2].y));
+			vertex((int) (fish.position.x + tail[0].x),
+					(int) (fish.position.y + tail[0].y));
+			vertex((int) (fish.position.x + tail[1].x),
+					(int) (fish.position.y + tail[1].y));
+			vertex((int) (fish.position.x + head[0].x),
+					(int) (fish.position.y + head[0].y));
+			endShape();
+
 		}
-		else if(totalAccel < 2)
-		{
-			fishSprite.setFrame(animCounter % 5);
-		}
-		else
-		{
-			fishSprite.setFrame(frameCounter % 5);
-		}
-		//fishSprite.setZorder(frameCounter%62);
-		S4P.drawSprites();
+		// END DRAW FISH	
 		
+		//====DISPLAY EXTRAS====
 		// Draws each fish's basis vectors
 		if (Set.SHOW_Bases) {
 			stroke(255, 255, 0);

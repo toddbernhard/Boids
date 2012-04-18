@@ -18,12 +18,12 @@ public class Set {
 										   {  800,    600,    50 }};
 
 	
-	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget
-	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false },
-														{ false, false, false, false, false,  true, false },
-		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false },
-														{ false, false, false, false, false,  true, false },
-														{ false, false, false, false, false,  true, false }};
+	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget, Sprites(vsDrawn)
+	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false, false },
+														{ false, false, false, false, false,  true, false, false },
+		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, false },
+														{ false, false, false, false, false,  true, false, false },
+														{ false, false, false, false, false,  true, false, true }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	public static final int[][] populations =  {{  75,     75,     75,        75,         0,      0,     3    },
@@ -80,6 +80,7 @@ public class Set {
 	public static final boolean SHOW_Groups =           display_toggles[config_n][4]; // Haven't tested this in a while
 	public static final boolean SHOW_Obstacle =         display_toggles[config_n][5]; // Normally on, but if you want to have invisible obstacles
 	public static final boolean SHOW_ObstacleTarget =   display_toggles[config_n][6]; // The area obstacles aim for when spawned
+	public static final boolean SHOW_Sprites = 			display_toggles[config_n][7]; // Whether we render sprites or draw by procedure
 
 	public static final int NUMBER_FishRed =    populations[config_n][0];
 	public static final int NUMBER_FishBlue =   populations[config_n][1];
