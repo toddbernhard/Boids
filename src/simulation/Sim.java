@@ -2,9 +2,18 @@ package simulation;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.lang.Math;
 
+<<<<<<< HEAD
 import kinect.Kinect;
 import kinect.KinectConfig;
+=======
+import processing.core.*;
+import sprites.*;
+//import processing.core.PGraphics;
+//import processing.opengl.*;
+
+>>>>>>> Win64
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -15,13 +24,23 @@ import boids.Person;
 import boids.Shark;
 //import boids.YellowFish;
  
+
+
 @SuppressWarnings("serial")
 public class Sim extends PApplet{
 
+<<<<<<< HEAD
 	public static int frameCounter;  // Used for animation and color cycles. Shadows p5's frameCount, but is public
+=======
+	public static int frameCounter;  // Used for animation and color cycles
+	public static int animCounter;
+>>>>>>> Win64
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
+	//public PImage fishpic = loadImage("E:/Storage/Programs/myPrograms/Boids/images/fish.png", "png");
+	//public Animation animation1 = new Animation("E:/Storage/Programs/myPrograms/Boids/images/fish", 2);
+	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 0);
 	
 	public ArrayList<Boid> school;
 	public Kinect kinect;
@@ -30,10 +49,16 @@ public class Sim extends PApplet{
 	
 	@Override
 	public void setup() {
-		
+		fishSprite.setFrameSequence(0, 24);
+		fishSprite.setAnimInterval(.05);
+		float scale = (float)0.5;
+		fishSprite.setScale(scale);
+		frameRate(30);
+		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
-		
+				
 		frameCounter = 0;
+		animCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
@@ -101,6 +126,7 @@ public class Sim extends PApplet{
  
 	@Override
 	public void draw() {
+<<<<<<< HEAD
 		
 		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
 			background(0, 20, 80); // Clear screen
@@ -110,6 +136,16 @@ public class Sim extends PApplet{
 					stroke(255);
 					point(Boid.redoRange(kinect.goodPixels[i]%640,0,800,0,640), Boid.redoRange(kinect.goodPixels[i]/640,0,600,0,480));
 				}
+=======
+		if( Set.paused == false ) {
+		
+			background(0,20,80);  // Clear screen
+		
+			// If we have obstacles and target is turned on,  draw it
+			if( Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true ) {
+				fill( 150, 0, 0, 40 );
+				rect( Set.SCREEN_Width/2, Set.SCREEN_Height/2, Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize );
+>>>>>>> Win64
 			}
 		}
 		else
@@ -182,6 +218,14 @@ public class Sim extends PApplet{
 					}
 				}				
 			}
+<<<<<<< HEAD
+=======
+		
+			frameCounter++;
+			animCounter = frameCounter/3;
+		
+		}
+>>>>>>> Win64
 		// else
 	
 	}
@@ -350,6 +394,7 @@ public class Sim extends PApplet{
 		tail[1].mult( (float) Fish.T_LENGTH );
 		*/
 		
+		/*
 		// Draw head
 		fill( fish.head_color );
 		stroke( fish.head_color );
@@ -375,7 +420,31 @@ public class Sim extends PApplet{
 		vertex( (int)(fish.position.x+head[0].x), (int)(fish.position.y+head[0].y) );
 		endShape();
 		/// END DRAW FISH
+		*/
+		rand = new Random();
+		//animation1.display(fish.position.x, fish.position.y, fish.position.x, fish.position.y);
+		//image(fishpic, fish.position.x, fish.position.y);
+		float angle = atan2(fish.speed.x, fish.speed.y);
+		fishSprite.setRot(angle);
+		fishSprite.setXY(fish.position.x, fish.position.y);
+		//fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
+		double totalAccel = Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y));
+		System.out.print(Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y) )+"\n");
 		
+		if(totalAccel < 1)
+		{
+			fishSprite.setFrame(animCounter/2 % 5);
+		}
+		else if(totalAccel < 2)
+		{
+			fishSprite.setFrame(animCounter % 5);
+		}
+		else
+		{
+			fishSprite.setFrame(frameCounter % 5);
+		}
+		//fishSprite.setZorder(frameCounter%62);
+		S4P.drawSprites();
 		
 		// Draws each fish's basis vectors
 		if( Set.SHOW_Bases ) {
@@ -565,6 +634,7 @@ public class Sim extends PApplet{
 	}
 	*/
 	
+<<<<<<< HEAD
 	public ArrayList<PImage> loadSprites(String pathFormatString, int numberOfSprites) {
 		ArrayList<PImage> sprites = new ArrayList<PImage>();
 		
@@ -574,7 +644,56 @@ public class Sim extends PApplet{
 		
 		return sprites;
 	}
+=======
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	class Animation {
+		  PImage[] images;
+		  int imageCount;
+		  int frame;
+		  
+		  Animation(String imagePrefix, int count) {
+		    imageCount = count;
+		    images = new PImage[imageCount];
 
+		    for (int i = 0; i < imageCount; i++) {
+		      // Use nf() to number format 'i' into four digits
+		      String filename = imagePrefix + nf(i, 4) + ".png";
+		      images[i] = loadImage(filename, "png");
+		    }
+		    for (int k = 0; k < imageCount; k++)
+		    {
+		    	images[k].resize(20, 20);
+		    }
+		  }
+>>>>>>> Win64
+
+		  void display(float xpos, float ypos, float xvel, float yvel) {
+			if(ypos>xpos ||(-xpos>ypos))
+			{
+				frame= 1;
+			}
+			else
+			{
+				frame=0;
+			}
+		    //frame = (frame+1) % imageCount;
+			  image(images[frame], xpos, ypos);
+		  }
+		  
+		  int getWidth() {
+		    return images[0].width;
+		  }
+		}
+*/
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);
 
