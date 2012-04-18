@@ -14,6 +14,9 @@ import SimpleOpenNI.SimpleOpenNI;
 public class Kinect {
 
 	public static final int MOTION_DETECTION = 1;
+	
+	public static final int DEPTH_MIN = 0;
+	public static final int DEPTH_MAX = 3000;
 
 	public static int COLOR_OFFSET;
 	public static int NUM_COLORS;
@@ -38,12 +41,14 @@ public class Kinect {
 	public int range = -4400;
 	public int rangeSize = 4000;
 
-	public int[] mapToSimC = new int[640]; // each col of Kinect depth image corresponds to a col of Sim screen
-	public int[] mapToSimR = new int[480]; //  "   row        "         "          "          row      "
-
+	public int[] mapKinectToSim_Col = new int[640]; // Each col of Kinect depth image corresponds to a col of Sim screen
+	public int[] mapKinectToSim_Row = new int[480]; // Each row        "         "          "          row      "
+	
+	public int[] mapDepthToColor;
+			
 	public KinectConfig config; // handle for KinectConfig, if in Setup mode
 
-	public int alphaChannel = 255;
+	public int alphaChannel = 200;
 
 	public Kinect(Sim simul, int mode) {
 		// If we'll need a config, create one
@@ -52,13 +57,16 @@ public class Kinect {
 		}
 
 		// If we have to render, register our colors
-		if (Set.KINECT_Render) {
+		if (Set.KINECT_INIT_Render || Set.KINECT_SetupMode ) {
 			NUM_COLORS = (SPECTRUM.length - 1) * 256 + 1;
 			COLOR_OFFSET = simul.registerColors(createColors());
+			mapDepthToColor = createDepthToColorMap();
 		}
 
-		// generate lookup arrays mapToSimC and mapToSimR
-		mapDepthToSim();
+		// generate lookup arrays mapKinectToSim_Col and mapKinectToSim_Row
+		createKinectToSimMap();
+		
+		// generate lookup arrays 
 
 		// SimpleOpenNI handle
 		context = new SimpleOpenNI(simul, SimpleOpenNI.RUN_MODE_MULTI_THREADED);
@@ -68,9 +76,6 @@ public class Kinect {
 
 		// initialize the static scene
 		staticScene = new int[context.depthMap().length];
-		for (int pixel : staticScene) {
-			pixel = 0;
-		}
 	}
 
 	public void init() {
@@ -81,7 +86,7 @@ public class Kinect {
 		context.update();
 		depthMap = context.depthMap();
 		diffMap = new int[depthMap.length];
-		if( Set.KINECT_AffectsSim ) {
+		if( Set.KINECT_INIT_AffectsSim ) {
 			pointCloud = new boolean[depthMap.length];
 		}
 
@@ -132,7 +137,7 @@ public class Kinect {
 		for (int i = 0; i < goodPixels.length; i++) {
 			diffMap[goodPixels[i]] = depthMap[goodPixels[i]]
 					- staticScene[goodPixels[i]];
-			if( Set.KINECT_AffectsSim ) {
+			if( Set.kinect_AffectsSim ) {
 				if( diffMap[goodPixels[i]] > range &&
 					diffMap[goodPixels[i]] < range+rangeSize ) {
 					
@@ -172,8 +177,6 @@ public class Kinect {
 			goodPixels[i] = (Integer) Ostack[i];
 		}
 		
-		System.out.println(goodPixels.length);
-
 	}
 
 	/*
@@ -181,25 +184,38 @@ public class Kinect {
 	 * pixels and populates mapToSimR (with the row indices) and mapToSimC (with
 	 * the column indices)
 	 */
-	private void mapDepthToSim() {
+	private void createKinectToSimMap() {
 
 		if (Set.KINECT_Coord[1][0] - Set.KINECT_Coord[0][0] < 640
 				|| Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1] < 480) {
-			System.out.printf("warning: compressing depth image to %dx%d"
-					+ " (orig. 640x480). unsupported size",
+			System.out.printf("warning: unsupported size. compressing depth image to %dx%d"
+					+ " (orig. 640x480)",
 					Set.KINECT_Coord[1][0] - Set.KINECT_Coord[0][0],
 					Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1]);
 		}
 
 		for (int i = 0; i < 640; i++) {
-			mapToSimC[639-i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][0],
+			mapKinectToSim_Col[639-i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][0],
 					Set.KINECT_Coord[1][0], 0, 640);
 		}
 
 		for (int i = 0; i < 480; i++) {
-			mapToSimR[i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][1],
+			mapKinectToSim_Row[i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][1],
 					Set.KINECT_Coord[1][1], 0, 480);
 		}
+	}
+	
+	
+	private int[] createDepthToColorMap() {
+		
+		int[] map = new int[DEPTH_MAX-DEPTH_MIN+1];
+		
+		for( int i=DEPTH_MIN; i<=DEPTH_MAX; i++) {
+			map[i] = (int) Boid.redoRange( i, 0, NUM_COLORS, DEPTH_MIN, DEPTH_MAX+2 );
+		}
+		
+		return map;
+		
 	}
 
 	private int[][] createColors() {

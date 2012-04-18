@@ -91,16 +91,6 @@ public class Fish extends Boid implements Aware, Flockable {
 		PVector accel = calculateAccel( school );
 		accel = avoidEgdes(accel);
 		
-		/*
-		if( Float.isNaN(accel.x) || Float.isNaN(accel.y) ) {
-			try {
-				Thread.sleep( 6000 );
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			System.out.print(" HERE IT IS" );
-		}
-		*/
 		
 		// If accel == null, skip down to end
 		if( accel != null ) {
@@ -277,14 +267,14 @@ public class Fish extends Boid implements Aware, Flockable {
 		}
 		
 		// Use pointCloud if we should
-		if( Set.KINECT_AffectsSim ) {
+		if( Set.kinect_AffectsSim ) {
 			Kinect kinect = Sim.kinect;
 			for( i=0; i<kinect.goodPixels.length; i++ ) {
 				if( kinect.pointCloud[kinect.goodPixels[i]] ) {
-					displaceVector.x = position.x - kinect.mapToSimC[kinect.goodPixels[i]%640];
-					displaceVector.y = position.y - kinect.mapToSimR[kinect.goodPixels[i]/640];
+					displaceVector.x = position.x - kinect.mapKinectToSim_Col[kinect.goodPixels[i]%640];
+					displaceVector.y = position.y - kinect.mapKinectToSim_Row[kinect.goodPixels[i]/640];
 					if( displaceVector.mag() < AWARE_RADIUS ) {
-						displaceVector.div(10);
+						displaceVector.div(4);
 						avoidance.add( displaceVector );
 					}
 				}

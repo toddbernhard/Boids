@@ -171,13 +171,16 @@ public class Sim extends PApplet {
 		// Display StdDev Adjust mode for Kinect
 		if (Set.KINECT_SetupMode
 				&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
-			background(0, 20, 80); // Clear screen
+			background(10, 40, 100); // Clear screen
 
-			for (int i = 0; i < kinect.goodPixels.length; i++) {
-				if (kinect.config.stats[kinect.goodPixels[i]].getStdDev() > kinect.filterThreshold) {
-					stroke(255);
-					point(kinect.mapToSimC[kinect.goodPixels[i] % 640],
-							kinect.mapToSimR[kinect.goodPixels[i] / 640]);
+			for (int i = 0; i < kinect.depthMap.length; i++) {
+				if (kinect.config.stats[i].getStdDev() > kinect.filterThreshold) {
+					
+					if( kinect.filter ) stroke(80,50,50);
+					else stroke(255);
+					
+					point(kinect.mapKinectToSim_Col[i % 640],
+							kinect.mapKinectToSim_Row[i / 640]);
 				}
 			}
 		} else
@@ -201,7 +204,8 @@ public class Sim extends PApplet {
 			}
 			
 			/*
-			 * TODO Groups don't work if (Set.SHOW_Groups) {
+			 * TODO Groups don't work
+			 * if (Set.SHOW_Groups) {
 			 * Boid.group(school); }
 			 */
 
@@ -211,41 +215,40 @@ public class Sim extends PApplet {
 			}
 
 			// Display Range Adjust mode for Kinect 
-			int temp;
-			if (Set.KINECT_SetupMode
-					&& kinect.config.mode == KinectConfig.MODE_RangeAdjust) {
+			int color_index;
+			if (Set.KINECT_On && (Set.kinect_Render ||
+					(Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust) )) {
 
 				for (int i = 0; i < kinect.goodPixels.length; i++) {
 
-					if (!kinect.config.rangeBg
-							&& (kinect.diffMap[kinect.goodPixels[i]] < kinect.range 
-								|| kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize)) {
-						continue;
-					} else {
-						temp = (int) Boid.redoRange(
-								kinect.depthMap[kinect.goodPixels[i]], 0,
-								Kinect.NUM_COLORS, 0, 2500);
-						if (temp < 0) {
-							temp = 0;
-						} else if (temp >= Kinect.NUM_COLORS) {
-							temp = Kinect.NUM_COLORS - 1;
+					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range 
+								&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range+kinect.rangeSize) {
+						if (kinect.depthMap[kinect.goodPixels[i]] < Kinect.DEPTH_MIN) {
+							color_index = 0;
+						} else if (kinect.depthMap[kinect.goodPixels[i]] > Kinect.DEPTH_MAX) {
+							color_index = Kinect.NUM_COLORS;
+						} else {
+							color_index = kinect.mapDepthToColor[kinect.depthMap[kinect.goodPixels[i]]];
 						}
 
-						stroke(colors.get(Kinect.COLOR_OFFSET + temp));
+						stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
 
-						point(kinect.mapToSimC[kinect.goodPixels[i] % 640],
-								kinect.mapToSimR[kinect.goodPixels[i] / 640]);
+						point(kinect.mapKinectToSim_Col[kinect.goodPixels[i] % 640],
+								kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
 					}
 				}
 			}
 		}
 
+		
+		// SLOW, TODO maybe cache a loop
 		if (Set.JOGL_RenderShaders) {
 			renderShaders();
 		}
 
-		// TODO remove
 		// Renders Kinect color spectrum at the bottom of screen
+		// SLOW, but OKAY
+		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
 		for (int i = 0; i < Set.SCREEN_Width; i++) {
 			stroke(colors.get(Kinect.COLOR_OFFSET
 					+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
@@ -261,17 +264,27 @@ public class Sim extends PApplet {
 	@Override
 	public void keyPressed() {
 
+		switch(key) {
+		case ' ':
+			Set.paused = !Set.paused;
+			System.out.println(Set.paused ? "PAUSE" : "PLAY");
+			return;
+		case 'a':
+			Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
+			System.out.println(Set.kinect_AffectsSim ? "sim using kinect" : "sim ignoring kinect");
+			return;
+		case 's':
+			Set.kinect_Render = !Set.kinect_Render;
+			System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
+			return;
+		}
 		if (keyCode == ESC) {
 			System.out.println("Goodbye");
 			System.exit(0);
 		}
 
-		if (key == ' ') {
-			Set.paused = !Set.paused;
-		}
-
 		if (Set.KINECT_SetupMode) {
-
+			
 			kinect.config.keyPressed(key, keyCode);
 
 		}
@@ -647,7 +660,6 @@ public class Sim extends PApplet {
 
 		pgl.endGL();
 	}
-	
 	
 	private static String readFileAsString(String filePath)
 			throws java.io.IOException {
