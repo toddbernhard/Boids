@@ -1,5 +1,6 @@
 package simulation;
 
+
 /*
  * Settings
  */
@@ -8,27 +9,18 @@ public class Set {
 	
 	// TODO why is this here? where is it from
 	//	public static final int AVOID_RADIUS = 10;
-	
-	// this controls the speed of the water in the background
-	// bigger = faster
-	public static final float timeIncrement = (float)0.002;
-	
-	public static final String vertexShaderSourceLocation = "/Users/vestibule/java_workspace/Boids/warping.vert";
-	public static final String fragmentShaderSourceLocation = "/Users/vestibule/java_workspace/Boids/warping_water.frag";
-	
+
 						   // Format =    [ Scrn W, Scrn H, Edge ]
-	public static final int[][] screen =  {{  800,     600,   50 },
+	public static final int[][] screen =  {{  800,    600,    50 },
 										   {  800,    600,    50 },
 										   { 1200,    675,     0 },
 										   {  800,    600,    50 },
 										   {  800,    600,    50 }};
 	
 							// Format =     [ On, Render, SetupMode ]
-	public static final boolean[][] kinect = {{ false, false, false },
-											  { false, false, false },
-											  { false, false, false },
-											  { false, false, false },
-											  { true,  true , true  }};
+	private static final boolean[][] kinect = {{ false, false, false, false },
+											   {  true,  true, true , false },
+											   {  true,  true, true , true  }};
 	
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget
 	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false },
@@ -42,7 +34,7 @@ public class Set {
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 200,      0,    300,         0,         0,      0,     2    },
 												{ 200,      0,     25,         0,         0,      3,     2    },
-												{ 200,      0,    100,         0,         0,      0,     0    }};
+												{ 200,      0,      0,         0,         0,      0,     0   }};
 				    
 	public static final int config_n = 4;
 
@@ -51,17 +43,34 @@ public class Set {
 	public static final int SCREEN_EdgeWidth =		screen[config_n][2];
 	public static final int SCREEN_FrameRate =		30; // Maximum framerate
 	
+	public static final int 	KINECT_ConfigNumber 	= 2;
+	public static final boolean KINECT_On 				= kinect[KINECT_ConfigNumber][0]; // Global on/off
+	public static final boolean KINECT_SetupMode		= KINECT_On && kinect[KINECT_ConfigNumber][2]; // Let's you play with the parameters
+	public static final boolean KINECT_Render			= KINECT_On && (KINECT_SetupMode || kinect[KINECT_ConfigNumber][1]); // Render the kinect in simulation
+	public static final boolean KINECT_AffectsSim		= KINECT_On && kinect[KINECT_ConfigNumber][3];
 	
-	public static final boolean KINECT_On 				= kinect[config_n][0]; // Global on/off
-	public static final boolean KINECT_SetupMode		= (KINECT_On && kinect[config_n][2]); // Let's you play with the parameters
-	public static final boolean KINECT_Render			= KINECT_On && (KINECT_SetupMode || kinect[config_n][1]); // Render the kinect in simulation
-	
-	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
+	public static final int 	KINECT_CalibrationLevel = 200;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 2;	// # of frames per Kinect update
-	public static final int[][] KINECT_DepthMapCoord	= {{ 0, 0 },
-														  { SCREEN_Width, SCREEN_Width }}; // {x1,y1} {x2,y2}
+	public static final int 	KINECT_SampleInterval   = 4;  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
 	public static final boolean KINECT_FancyStart		= false; // BROKEN
+
+	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
+	// Format = {x1,y1},{x2,y2}
+	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{SCREEN_Width,SCREEN_Height }},  // Initial museum steup
+														    {{   0,  0 },{SCREEN_Width,SCREEN_Height }} };// Todd's room
+	public static final int[][] KINECT_Coord			= KINECT_CoordTable[1];
+
+	
+	public static final boolean JOGL_RenderShaders = false;
+	// this controls the speed of the water in the background
+	// bigger = faster
+	public static final float JOGL_TimeIncrement = (float)0.002;
+		
+	public static final String JOGL_VertexPath = "/Users/vestibule/java_workspace/Boids/warping.vert";
+	public static final String JOGL_FragmentPath = "/Users/vestibule/java_workspace/Boids/warping_water.frag";
+		
+	
 	
 	public static final boolean SHOW_Bases =            display_toggles[config_n][0]; // Local coordinate system for each fish
 	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel
@@ -149,3 +158,4 @@ public class Set {
 	public static boolean paused = false;
 	
 }
+ 

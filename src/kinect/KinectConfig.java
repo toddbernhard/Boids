@@ -11,8 +11,6 @@ public class KinectConfig {
 	public static final int MODE_Test			= 4;
 	
 	public int mode;
-	public int range;
-	public int rangeSize;
 	public boolean rangeBg;
 	public RunningStat[] stats;
 	
@@ -27,8 +25,6 @@ public class KinectConfig {
 	public void reset() {
 		mode = 0;
 		kinect.filter = false;
-		range = -4400;
-		rangeSize = 4000;
 		rangeBg = false;
 	}
 
@@ -41,8 +37,8 @@ public class KinectConfig {
 				System.out.printf("std-dev=%f\n", kinect.filterThreshold);
 			}
 			if(mode == MODE_RangeAdjust) {
-				range += rangeSize/4;
-				System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
+				kinect.range += kinect.rangeSize/4;
+				System.out.printf("range=[%d,%d]\n", kinect.range, kinect.range+kinect.rangeSize);
 			}
 			
 		} else if(keyCode == PConstants.DOWN) {
@@ -52,8 +48,8 @@ public class KinectConfig {
 				System.out.printf("std-dev=%f\n", kinect.filterThreshold);
 			}
 			if(mode == MODE_RangeAdjust) {
-				range -= rangeSize/4;
-				System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
+				kinect.range -= kinect.rangeSize/4;
+				System.out.printf("range=[%d,%d]\n", kinect.range, kinect.range+kinect.rangeSize);
 			}
 			
 		} else if(keyCode == PConstants.RIGHT) {
@@ -114,16 +110,16 @@ public class KinectConfig {
 			case '+':
 			case '=':
 				if( mode == MODE_RangeAdjust ) {
-					rangeSize *= 1.5;
-					System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
+					kinect.rangeSize *= 1.5;
+					System.out.printf("range=[%d,%d]\n", kinect.range, kinect.range+kinect.rangeSize);
 				}
 				break;
 			case '-':
 			case '_':
 				if( mode == MODE_RangeAdjust ) {
-					rangeSize /= 1.5;
-					if( rangeSize < 5 ) rangeSize = 5;
-					System.out.printf("range=[%d,%d]\n", range, range+rangeSize);
+					kinect.rangeSize /= 1.5;
+					if( kinect.rangeSize < 5 ) kinect.rangeSize = 5;
+					System.out.printf("range=[%d,%d]\n", kinect.range, kinect.range+kinect.rangeSize);
 				}
 				break;
 			}

@@ -5,6 +5,9 @@ import interfaces.Flockable;
 
 import java.util.ArrayList;
 
+import kinect.Kinect;
+
+import processing.core.PApplet;
 import processing.core.PVector;
 import simulation.Boid;
 import simulation.Set;
@@ -269,6 +272,21 @@ public class Fish extends Boid implements Aware, Flockable {
 					displaceVector.mult( Set.FISH_HungerWeight );
 					avoidance.sub( displaceVector );
 				
+				}
+			}
+		}
+		
+		// Use pointCloud if we should
+		if( Set.KINECT_AffectsSim ) {
+			Kinect kinect = Sim.kinect;
+			for( i=0; i<kinect.goodPixels.length; i++ ) {
+				if( kinect.pointCloud[kinect.goodPixels[i]] ) {
+					displaceVector.x = position.x - kinect.mapToSimC[kinect.goodPixels[i]%640];
+					displaceVector.y = position.y - kinect.mapToSimR[kinect.goodPixels[i]/640];
+					if( displaceVector.mag() < AWARE_RADIUS ) {
+						displaceVector.div(10);
+						avoidance.add( displaceVector );
+					}
 				}
 			}
 		}
