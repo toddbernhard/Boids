@@ -13,9 +13,10 @@ public class Set {
 						   // Format =    [ Scrn W, Scrn H, Edge ]
 	public static final int[][] screen =  {{  800,    600,    50 },
 										   {  800,    600,    50 },
-										   { 1200,    675,     0 },
+										   {  800,    600,     0 },
 										   {  800,    600,    50 },
-										   {  800,    600,    50 }};
+										   {  800,    600,    50 },
+										   {  800,    600,     0 }};
 
 	
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget, Sprites(vsDrawn)
@@ -23,16 +24,18 @@ public class Set {
 														{ false, false, false, false, false,  true, false, false },
 		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, false },
 														{ false, false, false, false, false,  true, false, false },
-														{ false, false, false, false, false,  true, false, true }};
+														{ false, false, false, false, false,  true, false, true  },
+														{ false, false, false, false, false,  false, false, false }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	public static final int[][] populations =  {{  75,     75,     75,        75,         0,      0,     3    },
-												{ 4,      0,      0,         0,         0,      0,     4    },
-												{ 200,      0,    300,         0,         0,      0,     2    },
+												{   4,      0,      0,         0,         0,      0,     4    },
+												{  20,     20,     20,        20,         2,      2,     4    },
 												{ 200,      0,     25,         0,         0,      3,     2    },
-												{ 200,      0,     50,         0,         0,      0,     0   }};
+												{ 200,      0,     50,         0,         0,      0,     0   },
+												{ 350,    150,     50,        20,         0,      0,     0   }};
 				    
-	public static final int config_n = 4;
+	public static final int config_n = 5;
 
 	public static final int SCREEN_Width = 			screen[config_n][0];
 	public static final int SCREEN_Height =			screen[config_n][1];
@@ -50,7 +53,7 @@ public class Set {
 	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || kinect[KINECT_ConfigNumber][2]); // Render the kinect in simulation
 	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && kinect[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
-	public static final int 	KINECT_CalibrationLevel = 10;	// Calibration sample size
+	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
 	public static final int 	KINECT_SampleInterval   = 8;  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out

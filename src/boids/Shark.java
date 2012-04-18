@@ -39,7 +39,7 @@ public class Shark extends Boid {
 	}
 	
 	@Override
-	public void step(ArrayList<Boid> flock) {
+	public int step(ArrayList<Boid> flock) {
 		
 		Fish closest = null;
 		float distance = 100000;
@@ -95,6 +95,8 @@ public class Shark extends Boid {
 		hungerColor = Sim.colors.get( (int) (HEALTH_COLOR_OFFSET + hunger*(Set.SHARK_HealthLevels-1)) );
 		energyColor = Sim.colors.get( (int) (HEALTH_COLOR_OFFSET + energy*(Set.SHARK_HealthLevels-1)) );
 		
+		// no change in school
+		return 0;
 	}
 
 	
@@ -175,5 +177,22 @@ public class Shark extends Boid {
 	public Type getTYPE() {
 		// TODO Auto-generated method stub
 		return TYPE;
+	}
+
+	@Override
+	public void drawBoid(Sim sim) {
+		sim.stroke(color);
+
+		// fill( shark.energyColor );
+		// arc( shark.position.x, shark.position.y, (int) (shark.size*1.5),
+		// (int) (shark.size*1.5), PI, PI+PI/2 );
+
+		// fill( shark.hungerColor );
+		// arc( shark.position.x, shark.position.y, (int) (shark.size*1.5),
+		// (int) (shark.size*1.5), PI+PI/2, TWO_PI );
+
+		sim.fill(color);
+		sim.ellipse(position.x, position.y, size, size);
+
 	}
 }
