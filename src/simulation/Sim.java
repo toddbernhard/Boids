@@ -13,6 +13,9 @@ import javax.media.opengl.GL;
 import kinect.Kinect;
 import kinect.KinectConfig;
 
+import processing.opengl.*;
+import javax.media.opengl.*;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 import processing.opengl.PGraphicsOpenGL;
