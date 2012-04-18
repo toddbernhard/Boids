@@ -1,5 +1,6 @@
 package boids;
 
+import processing.core.*;
 import interfaces.Aware;
 import interfaces.Flockable;
 
@@ -15,7 +16,7 @@ import simulation.Sim;
 
 
 public class Fish extends Boid implements Aware, Flockable {
-	
+		
 	public static final Boid.Type TYPE = Boid.Type.FISH;
 	
 	// Indices for the different styles
