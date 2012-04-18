@@ -1,11 +1,11 @@
 package simulation;
 
-
 /*
  * Settings
  */
 
 public class Set {
+
 	
 	// TODO why is this here? where is it from
 	//	public static final int AVOID_RADIUS = 10;
@@ -27,7 +27,7 @@ public class Set {
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	public static final int[][] populations =  {{  75,     75,     75,        75,         0,      0,     3    },
-												{ 400,      0,      0,         0,         0,      0,     4    },
+												{ 4,      0,      0,         0,         0,      0,     4    },
 												{ 200,      0,    300,         0,         0,      0,     2    },
 												{ 200,      0,     25,         0,         0,      3,     2    },
 												{ 200,      0,     50,         0,         0,      0,     0   }};

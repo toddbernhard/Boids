@@ -9,33 +9,35 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.lang.Math;
 
-
 import processing.core.*;
-import processing.opengl.*;
-import javax.media.opengl.GL;
-
-import boids.*;
-import sprites.*;
 
 import kinect.Kinect;
 import kinect.KinectConfig;
 
+import processing.opengl.*;
+import javax.media.opengl.*;
 
-@SuppressWarnings("serial")
-public class Sim extends PApplet{
+import sprites.*;
+
+import boids.Fish;
+import boids.Food;
+import boids.Obstacle;
+import boids.Person;
+import boids.Shark;
+
+
+public class Sim extends PApplet {
 
 	public static int frameCounter; // Used for animation and color cycles.
 									// Shadows p5's frameCount, but is public
-	public static int animCounter;
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
-											 // Boids register their colors on spawn.
-	//public PImage fishpic = loadImage("E:/Storage/Programs/myPrograms/Boids/images/fish.png", "png");
-	//public Animation animation1 = new Animation("E:/Storage/Programs/myPrograms/Boids/images/fish", 2);
-	public Sprite fishSprite = new Sprite(this, "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png", 7, 5, 0);
+												// Boids register their colors
+												// on spawn.
+
+	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 0);
 	
 	public ArrayList<Boid> school;
-
 	public static Kinect kinect;
 
 	private int[][] pointCloud;
@@ -48,6 +50,11 @@ public class Sim extends PApplet{
 
 	@Override
 	public void setup() {
+
+		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL); // Set the screen
+															// size
+		colorMode(RGB, 255);
+
 		fishSprite.setFrameSequence(0, 24);
 		fishSprite.setAnimInterval(.05);
 		float scale = (float)0.5;
@@ -57,7 +64,7 @@ public class Sim extends PApplet{
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 				
 		frameCounter = 0;
-		animCounter = 0;
+		//animCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
@@ -169,6 +176,7 @@ public class Sim extends PApplet{
 
 	@Override
 	public void draw() {
+		
 		// Display StdDev Adjust mode for Kinect
 		if (Set.KINECT_SetupMode
 				&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
@@ -183,6 +191,7 @@ public class Sim extends PApplet{
 					point(kinect.mapKinectToSim_Col[i % 640],
 							kinect.mapKinectToSim_Row[i / 640]);
 				}
+
 			}
 		} else
 
@@ -242,13 +251,16 @@ public class Sim extends PApplet{
 		}
 
 		
+<<<<<<< HEAD
 		// SLOW, TODO maybe cache a loop
 		if (Set.JOGL_RenderShaders) {
 			renderShaders();
+=======
+			frameCounter++;
+			animCounter = frameCounter/3;
+		
+>>>>>>> Win64
 		}
-
-		frameCounter++;
-		animCounter = frameCounter/3;
 
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
@@ -441,7 +453,20 @@ public class Sim extends PApplet{
 		 * Fish.T_LENGTH ); tail[1].mult( (float) Fish.T_LENGTH );
 		 */
 
+<<<<<<< HEAD
+=======
+		//PVector accel = fish.recentAccel;
+		PVector tail[] = { PVector.sub( accel, head[2] ),
+						   PVector.sub( accel, head[0] ) };
+		
+		tail[0].normalize();
+		tail[1].normalize();
+		tail[0].mult( (float) Fish.T_LENGTH );
+		tail[1].mult( (float) Fish.T_LENGTH );
+		*/
+		
 		/*
+>>>>>>> Win64
 		// Draw head
 		fill(fish.head_color);
 		stroke(fish.head_color);
@@ -475,6 +500,10 @@ public class Sim extends PApplet{
 		vertex((int) (fish.position.x + head[0].x),
 				(int) (fish.position.y + head[0].y));
 		endShape();
+<<<<<<< HEAD
+		// / END DRAW FISH
+
+=======
 		/// END DRAW FISH
 		*/
 		rand = new Random();
@@ -502,6 +531,7 @@ public class Sim extends PApplet{
 		//fishSprite.setZorder(frameCounter%62);
 		S4P.drawSprites();
 		
+>>>>>>> Win64
 		// Draws each fish's basis vectors
 		if (Set.SHOW_Bases) {
 			stroke(255, 255, 0);
@@ -707,6 +737,13 @@ public class Sim extends PApplet{
 		}
 		return new String(buffer);
 	}
+<<<<<<< HEAD
+
+	public int registerColors(int[][] newColors) {
+		assert (newColors != null);
+=======
+	*/
+	
 	
 	
 	
@@ -757,6 +794,7 @@ public class Sim extends PApplet{
 */
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);
+>>>>>>> Win64
 
 		int startIndex = colors.size();
 
