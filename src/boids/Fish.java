@@ -10,6 +10,7 @@ import kinect.Kinect;
 
 import processing.core.PConstants;
 import processing.core.PVector;
+import processing.core.PImage;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;
@@ -47,6 +48,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 	
 	public int head_color;
 	public int style;
+	public static ArrayList<PImage> sprites;
 	
 	public Fish( PVector position, PVector speed, int size, Sim simul, int color ) {
 		super(position, speed, size);
@@ -68,8 +70,10 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		if(COLOR_OFFSETS[color] == null) {
 			COLOR_OFFSETS[color] = simul.registerColors( createColors(color) );
 		}
+		
+		sprites = simul.loadSprites("../bin/fish0%d.png",5);
 	}
-	
+
 	public Fish( PVector position, PVector speed, Sim s, int color ) {
 		this( position, speed, 7, s, color );
 	}	
