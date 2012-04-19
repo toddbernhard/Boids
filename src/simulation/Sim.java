@@ -216,15 +216,40 @@ public class Sim extends PApplet{
 				//drawBoid(school.get(i));
 			}
 
-			// Display Range Adjust mode for Kinect 
+			// Render the kinect if we should 
 			int color_index;
-			if (Set.KINECT_On && (Set.kinect_Render ||
-					(Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust) )) {
+			if (Set.KINECT_SetupMode
+					&& (Set.kinect_Render || kinect.config.mode == KinectConfig.MODE_RangeAdjust)) {
 
 				for (int i = 0; i < kinect.goodPixels.length; i++) {
 
-					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range 
-								&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range+kinect.rangeSize) {
+					color_index = (int) Boid.redoRange(
+							kinect.diffMap[kinect.goodPixels[i]], 0,
+							Kinect.NUM_COLORS, kinect.range, kinect.range
+									+ kinect.rangeSize);
+
+					if( kinect.config.showBackground ) {
+						if (kinect.diffMap[kinect.goodPixels[i]] < kinect.range ) {
+							color_index = 0;
+						} else if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize) {
+							color_index = Kinect.NUM_COLORS;
+						}
+					} else if( kinect.diffMap[kinect.goodPixels[i]] < kinect.range ||
+							   kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize ) {
+						continue;
+					}
+					stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
+
+					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i] % 640],
+							kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
+				}
+			} else if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
+
+				for (int i = 0; i < kinect.goodPixels.length; i++) {
+
+					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range
+							&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range
+									+ kinect.rangeSize) {
 						if (kinect.depthMap[kinect.goodPixels[i]] < Kinect.DEPTH_MIN) {
 							color_index = 0;
 						} else if (kinect.depthMap[kinect.goodPixels[i]] > Kinect.DEPTH_MAX) {
@@ -239,7 +264,6 @@ public class Sim extends PApplet{
 								kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
 					}
 				}
-			}
 		}
 
 		
@@ -253,11 +277,12 @@ public class Sim extends PApplet{
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
 		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
-		for (int i = 0; i < Set.SCREEN_Width; i++) {
-			stroke(colors.get(Kinect.COLOR_OFFSET
-					+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
-							Set.SCREEN_Width)));
-			line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
+			for (int i = 0; i < Set.SCREEN_Width; i++) {
+				stroke(colors.get(Kinect.COLOR_OFFSET
+						+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
+								Set.SCREEN_Width)));
+				line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
+			}
 		}
 
 	}
@@ -274,12 +299,20 @@ public class Sim extends PApplet{
 			System.out.println(Set.paused ? "PAUSE" : "PLAY");
 			return;
 		case 'a':
-			Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
-			System.out.println(Set.kinect_AffectsSim ? "sim using kinect" : "sim ignoring kinect");
+			if( Set.KINECT_On ) {
+				Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
+				System.out.println(Set.kinect_AffectsSim ? "sim using kinect" : "sim ignoring kinect");
+			} else {
+				System.out.println("kinect isn't initialized");
+			}
 			return;
 		case 's':
-			Set.kinect_Render = !Set.kinect_Render;
-			System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
+			if( Set.KINECT_On && Set.KINECT_INIT_Render ) {
+				Set.kinect_Render = !Set.kinect_Render;
+				System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
+			} else {
+				System.out.println("kinect isn't initialized");
+			}
 			return;
 		}
 		if (keyCode == ESC) {

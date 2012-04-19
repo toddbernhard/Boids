@@ -6,21 +6,31 @@ package simulation;
 
 public class Set {
 
+	/*========= HOW TO USE ===========
+	 * Play with an *uncommented* config by changing the corresponding array values.
+	 * Add columns or additional arrays as needed, just try not to break previous configs in the process.
+	 * When you find a gopd set of parameters, save it by giving the index a comment.
+	 */
 	
-	// TODO why is this here? where is it from
-	//	public static final int AVOID_RADIUS = 10;
-
-						   // Format =    [ Scrn W, Scrn H, Edge ]
-	public static final int[][] screen =  {{  800,    600,    50 },
-										   {  800,    600,    50 },
-										   {  800,    600,     0 },
-										   {  800,    600,    50 },
-										   {  800,    600,    50 },
-										   {  800,    600,     0 }};
+	public static final int config_n = 
+		//	0; // Test configuration with all options turned on
+		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+		//  2; // Old demo 1: no kinect, red fish w/ sharks in small screen
+			3; // Same as 1 but w/ setup mode and dense sampling for renders
+		//	4;
+		//	5;
+			
+						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
+	private static final int[][] screen =  {{  800,    600,    50, 		1 },
+										   {  800,    600,     0, 		2 },
+										   {  800,    600,    50,		0 },
+										   {  800,    600,     0, 		3 },
+										   {  800,    600,    50, 	-1 },
+										   {  800,    600,     0, 	-1 }};
 
 	
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget, Sprites(vsDrawn)
-	public static final boolean[][] display_toggles =  {{ false, false, false, false, false,  true, false, false },
+	private static final boolean[][] display_toggles =  {{ true, true, true, true, true,  true, true, true },
 														{ false, false, false, false, false,  true, false, false },
 		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, false },
 														{ false, false, false, false, false,  true, false, false },
@@ -28,34 +38,45 @@ public class Set {
 														{ false, false, false, false, false,  false, false, false }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
-	public static final int[][] populations =  {{  75,     75,     75,        75,         0,      0,     3    },
-												{   4,      0,      0,         0,         0,      0,     4    },
-												{  20,     20,     20,        20,         2,      2,     4    },
-												{ 200,      0,     25,         0,         0,      3,     2    },
+	private static final int[][] populations =  {{  20,     20,     20,        20,         2,      2,     4    },
+												{ 350,    150,     50,        50,         0,      0,     0    },
+												{ 400,      0,      0,         0,         0,      0,     4    },
+												{ 350,    150,     50,        50,         0,      0,     0    },
 												{ 200,      0,     50,         0,         0,      0,     0   },
 												{ 350,    150,     50,        20,         0,      0,     0   }};
 				    
-	public static final int config_n = 5;
+	
 
 	public static final int SCREEN_Width = 			screen[config_n][0];
 	public static final int SCREEN_Height =			screen[config_n][1];
 	public static final int SCREEN_EdgeWidth =		screen[config_n][2];
 	public static final int SCREEN_FrameRate =		30; // Maximum framerate
 
-								// Format =     [ On, SetupMode, Render, AffectsSim ]
-	private static final boolean[][] kinect = {{ false, false,   false,   false },
-											   {  true,  true,   true ,   false },
-											   {  true,  false,   true,   true  }};
-	public static final int 	KINECT_ConfigNumber 	= 2;
-	public static final boolean KINECT_On 				= kinect[KINECT_ConfigNumber][0]; // Global on/off
-	public static final boolean KINECT_SetupMode		= KINECT_On && kinect[KINECT_ConfigNumber][1]; // Let's you play with the parameters
 	
-	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || kinect[KINECT_ConfigNumber][2]); // Render the kinect in simulation
-	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && kinect[KINECT_ConfigNumber][3]; // Whether fish react to kinect
+	//public static final int 	KINECT_ConfigNumber 	= 2; // override
+	public static final int 	KINECT_ConfigNumber		= screen[config_n][3];
+	
+							// Format =     [ On, SetupMode, Render, AffectsSim ]
+	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
+													 { true, true,   true,   true },	// Everything On
+											   		 {  true, false, false, true  },
+											   		 { true, true, false,	 true }};	// Hidden w/ no setup, sparse sampling
+	
+							// Format =		[ SampleInterval ]
+	private static final int[][] KINECT_INTS = {{  0 },
+												{  4 },
+												{ 12 },
+												{ 5  }};
+	
+	public static final boolean KINECT_On 				= KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
+	public static final boolean KINECT_SetupMode		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][1]; // Let's you play with the parameters
+	
+	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
+	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
 	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
-	public static final int 	KINECT_SampleInterval   = 8;  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
+	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
 	public static final boolean KINECT_FancyStart		= false; // BROKEN
 
@@ -161,8 +182,8 @@ public class Set {
 	
 
 	public static boolean paused				= false;
-	public static boolean kinect_Render			= KINECT_On && (KINECT_SetupMode || kinect[KINECT_ConfigNumber][1]); // Render the kinect in simulation
-	public static boolean kinect_AffectsSim		= KINECT_On && kinect[KINECT_ConfigNumber][3]; // Whether fish react to kinect
+	public static boolean kinect_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][1]); // Render the kinect in simulation
+	public static boolean kinect_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 
 }
  

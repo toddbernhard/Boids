@@ -1,4 +1,4 @@
-package boids;
++ boids;
 
 import interfaces.Aware;
 import interfaces.Flockable;
@@ -272,14 +272,14 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		}
 		
 		// Use pointCloud if we should
-		if( Set.kinect_AffectsSim ) {
+		if( Set.KINECT_On && Set.kinect_AffectsSim ) {
 			Kinect kinect = Sim.kinect;
 			for( i=0; i<kinect.goodPixels.length; i++ ) {
 				if( kinect.pointCloud[kinect.goodPixels[i]] ) {
 					displaceVector.x = position.x - kinect.mapKinectToSim_Col[kinect.goodPixels[i]%640];
 					displaceVector.y = position.y - kinect.mapKinectToSim_Row[kinect.goodPixels[i]/640];
 					if( displaceVector.mag() < AWARE_RADIUS ) {
-						displaceVector.div(4);
+						displaceVector.mult(kinect.pointCloudRepulsionMulti);
 						avoidance.add( displaceVector );
 					}
 				}
