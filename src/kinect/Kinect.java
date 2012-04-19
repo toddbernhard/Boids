@@ -41,7 +41,7 @@ public class Kinect {
 	public float filterThreshold = Set.KINECT_DefaultFilter; // filters out pixels w/ a stddev > threshold;
 	public int range = -4400;
 	public int rangeSize = 4000;
-	public float pointCloudRepulsionMulti = 900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
+	public float pointCloudRepulsionMulti = 0.1f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
 
 	public int[] mapKinectToSim_Col = new int[640]; // Each col of Kinect depth image corresponds to a col of Sim screen
 	public int[] mapKinectToSim_Row = new int[480]; // Each row        "         "          "          row      "

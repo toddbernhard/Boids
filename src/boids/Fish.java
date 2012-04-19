@@ -1,4 +1,4 @@
-+ boids;
+package boids;
 
 import interfaces.Aware;
 import interfaces.Flockable;
