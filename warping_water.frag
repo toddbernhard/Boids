@@ -128,8 +128,6 @@ float fbm(vec2 pos)
     float n = 0.0; // * snoise(vec3(x, y, t));
     n += 0.5 * (snoise(vec3(2.0 * x, 2.0 * y, 1.4*t)));
     n += 0.25 * (snoise(vec3(4.0 * x, 4.0 * y, 2.4*t)));
-    n += 0.125 * (snoise(vec3(8.0 * x, 8.0 * y, 3.4*t)));
-    n += 0.0625 * (snoise(vec3(16.0 * x, 16.0 * y, 4.4*t)));
     n = (n + 1.0) / 2.0;
     return n * 0.7;
 }
