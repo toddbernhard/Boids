@@ -2,10 +2,10 @@ package kinect;
 
 import java.util.ArrayList;
 
-import com.sun.tools.example.debug.bdi.SpecErrorEvent;
+//import com.sun.tools.example.debug.bdi.SpecErrorEvent;
 
 import processing.core.PApplet;
-import quicktime.app.spaces.Space;
+//import quicktime.app.spaces.Space;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;

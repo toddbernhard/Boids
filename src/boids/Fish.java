@@ -14,7 +14,9 @@ import processing.core.PImage;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;
-import sprites.S4P;
+import sprites.*;
+
+import java.util.Random;
 
 
 public class Fish extends Boid implements Aware, Flockable, HasSprites {
@@ -22,10 +24,10 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 	public static final Boid.Type TYPE = Boid.Type.FISH;
 	
 	// Indices for the different styles
-	public static final int RED = 0; // TODO use enum instead? handy to use names as index tho
-	public static final int BLUE = 1;
-	public static final int GREEN = 2;
-	public static final int YELLOW = 3;
+	public static final int STYLE1 = 0; // TODO use enum instead? handy to use names as index tho
+	public static final int STYLE2 = 1;
+	public static final int STYLE3 = 2;
+	public static final int STYLE4 = 3;
 	
 	public static final float MAX_TURN_RATIO = (float) Math.tan( Math.toRadians(Set.FISH_MaxTurnAngle) );
 
@@ -48,7 +50,13 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 	
 	public int head_color;
 	public int style;
+	
+	public int offset;
 	public static ArrayList<PImage> sprites;
+	public static Sprite fishSprite;
+	public static Sprite fishSprite2;
+	public static Sprite fishSprite3;
+	public static Sprite fishSprite4;
 	
 	public Fish( PVector position, PVector speed, int size, Sim simul, int color ) {
 		super(position, speed, size);
@@ -57,6 +65,9 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		T_ANGLE = (float) Math.atan(3);
 		H_WIDTH = 0.9f * size;
 		H_LENGTH = size;
+		Random generator = new Random();
+		
+		offset = generator.nextInt(1000);
 		
 		AWARE_RADIUS = 7 * size;
 		AWARE_CONE_LENGTH = 3 * AWARE_RADIUS;
@@ -67,11 +78,41 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		
 		style = color;
 		
+		if( Set.SHOW_Sprites ) {
+			
+			float scale = (float)0.5;
+			if(fishSprite == null){
+				fishSprite = new Sprite(simul, Set.FISH1_Path, Set.FISH1_Rows, Set.FISH1_Cols, 0);
+				fishSprite.setFrameSequence(0, 24);
+				fishSprite.setAnimInterval(.05);
+				fishSprite.setScale(scale);
+			}
+			if(fishSprite2 == null){
+				fishSprite2 = new Sprite(simul, Set.FISH2_Path, Set.FISH2_Rows, Set.FISH2_Cols, 0);
+				fishSprite2.setFrameSequence(0, 24);
+				fishSprite2.setAnimInterval(.05);
+				fishSprite2.setScale(scale);
+			}
+			if(fishSprite3 == null)
+			{
+				fishSprite3 = new Sprite(simul, Set.FISH3_Path, Set.FISH3_Rows, Set.FISH3_Cols, 0);
+				fishSprite3.setFrameSequence(0, 24);
+				fishSprite3.setAnimInterval(.05);
+				fishSprite3.setScale(scale);
+			}
+			if(fishSprite4 == null){
+				fishSprite4 = new Sprite(simul, Set.FISH4_Path, Set.FISH4_Rows, Set.FISH4_Cols, 0);
+				fishSprite4.setFrameSequence(0, 10);
+				fishSprite4.setAnimInterval(.05);
+				fishSprite4.setScale(scale*2);
+			}
+		}
+		
 		if(COLOR_OFFSETS[color] == null) {
 			COLOR_OFFSETS[color] = simul.registerColors( createColors(color) );
 		}
 		
-		sprites = simul.loadSprites("../bin/fish0%d.png",5);
+		//sprites = simul.loadSprites("../bin/fish0%d.png",5);
 	}
 
 	public Fish( PVector position, PVector speed, Sim s, int color ) {
@@ -357,22 +398,82 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 			// Code to animate sprites
 			
 			float angle = (float) getHeading();
-			sim.fishSprite.setRot(angle);
-			sim.fishSprite.setXY(position.x, position.y);
+			
 			float totalAccel = recentAccel.mag();
 			
-			if(totalAccel < 1)
+			if(style == STYLE1) //Balanced fish
 			{
-				sim.fishSprite.setFrame(Sim.frameCounter/6 % 5);
+				fishSprite.setRot(angle);
+				fishSprite.setXY(position.x, position.y);
+				
+				//fishSprite.setScale((float)AWARE_RADIUS/60);
+				fishSprite.setScale(Set.FISH1_Scale);
+				
+				if(totalAccel < 1){
+					fishSprite.setFrame((Sim.frameCounter+offset)/14 % 5);
+				}
+				else if(totalAccel < 2){
+					fishSprite.setFrame((Sim.frameCounter+offset)/8 % 5);
+				}
+				else{
+					fishSprite.setFrame((Sim.frameCounter+offset)/4 % 5);
+				}
 			}
-			else if(totalAccel < 2)
+			else if (style == STYLE2) //Slow moving fish (probably a large fish)
 			{
-				sim.fishSprite.setFrame(Sim.frameCounter/3 % 5);
+				fishSprite2.setRot(angle);
+				fishSprite2.setXY(position.x, position.y);
+				
+				//fishSprite2.setScale((float)AWARE_RADIUS/60);
+				fishSprite2.setScale(Set.FISH2_Scale);
+				
+				if(totalAccel < 1){
+					fishSprite2.setFrame((Sim.frameCounter+offset)/30 % 5);
+				}
+				else if(totalAccel < 2){
+					fishSprite2.setFrame((Sim.frameCounter+offset)/10 % 5);
+				}
+				else{
+					fishSprite2.setFrame((Sim.frameCounter+offset)/5 % 5);
+				}
 			}
-			else
+			else if (style == STYLE3) //balanced, but frantic in a tight spot
 			{
-				sim.fishSprite.setFrame(Sim.frameCounter % 5);
+				fishSprite3.setRot(angle);
+				fishSprite3.setXY(position.x, position.y);
+				
+				//fishSprite3.setScale((float)AWARE_RADIUS/60);
+				fishSprite3.setScale(Set.FISH3_SCALE);
+				
+				if(totalAccel < 1){
+					fishSprite3.setFrame((Sim.frameCounter+offset)/15 % 5);
+				}
+				else if(totalAccel < 2){
+					fishSprite3.setFrame((Sim.frameCounter+offset)/8 % 5);
+				}
+				else{
+					fishSprite3.setFrame((Sim.frameCounter+offset) % 5);
+				}
 			}
+			else if (style == STYLE4) // slowish, but frantic when in a tight space
+			{
+				fishSprite4.setRot(angle);
+				fishSprite4.setXY(position.x, position.y);
+				
+				//fishSprite4.setScale((float)AWARE_RADIUS/60);
+				fishSprite4.setScale(Set.FISH4_SCALE);
+				
+				if(totalAccel < 1){
+					fishSprite4.setFrame((Sim.frameCounter+offset)/20 % 5);
+				}
+				else if(totalAccel < 2){
+					fishSprite4.setFrame((Sim.frameCounter+offset)/10 % 5);
+				}
+				else{
+					fishSprite4.setFrame((Sim.frameCounter+offset) % 5);
+				}
+			}
+
 			//fishSprite.setZorder(frameCounter%62);
 			S4P.drawSprites();
 		

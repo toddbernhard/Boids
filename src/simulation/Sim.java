@@ -31,8 +31,7 @@ public class Sim extends PApplet{
 											 // Boids register their colors on spawn.
 	
 	// TODO make this more dynamic, put in settings too
-	public Sprite fishSprite;
-	
+
 	public ArrayList<Boid> school;
 
 	public static Kinect kinect; // kinect handle
@@ -54,14 +53,6 @@ public class Sim extends PApplet{
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 
-		if( Set.SHOW_Sprites ) {
-			fishSprite = new Sprite(this, "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png", 7, 5, 0);
-			fishSprite.setFrameSequence(0, 24);
-			fishSprite.setAnimInterval(.05);
-			float scale = (float)0.5;
-			fishSprite.setScale(scale);
-		}
-		
 		if (Set.KINECT_On) {
 			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
 			kinect.init();
@@ -118,14 +109,14 @@ public class Sim extends PApplet{
 
 			int color;
 			if (i < Set.NUMBER_FishRed) {
-				color = Fish.RED;
+				color = Fish.STYLE1;
 			} else if (i < Set.NUMBER_FishRed + Set.NUMBER_FishBlue) {
-				color = Fish.BLUE;
+				color = Fish.STYLE2;
 			} else if (i < Set.NUMBER_FishRed + Set.NUMBER_FishBlue
 					+ Set.NUMBER_FishGreen) {
-				color = Fish.GREEN;
+				color = Fish.STYLE3;
 			} else {
-				color = Fish.YELLOW;
+				color = Fish.STYLE4;
 			}
 
 			// position = anywhere
@@ -195,7 +186,7 @@ public class Sim extends PApplet{
 				kinect.update();
 			}
 
-			background(0, 20, 80); // Clear screen
+			background(20, 60, 150); // Clear screen
 
 			// If we have obstacles and target is turned on, draw it
 			if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {

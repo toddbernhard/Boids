@@ -684,7 +684,7 @@ public class Sprite implements Comparable<Object>, PConstants, SConstants {
 	 * @param spriteB
 	 * @return true if the sprites collide at the pixel level
 	 */
-	
+	 
 	/**
 	 * This method makes a circular area of pixels centered around hit_x/hit_y 
 	 * transparent. This works fine with sprites using per-pixel transparency.
