@@ -17,7 +17,7 @@ public class Set {
 		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//  2; // Old demo 1: no kinect, red fish w/ sharks in small screen
 			3; // Same as 1 but w/ setup mode and dense sampling for renders
-		//	4;
+			4; // Sprites test
 		//	5;
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
@@ -25,7 +25,7 @@ public class Set {
 										   {  800,    600,     0, 		2 },
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
-										   {  800,    600,    50, 	-1 },
+										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 	-1 }};
 
 	
@@ -42,7 +42,7 @@ public class Set {
 												{ 350,    150,     50,        50,         0,      0,     0    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    },
-												{ 200,      0,     50,         0,         0,      0,     0   },
+												{ 40,      40,      40,         40,         0,      0,     4    },
 												{ 350,    150,     50,        20,         0,      0,     0   }};
 				    
 	
@@ -58,9 +58,9 @@ public class Set {
 	
 							// Format =     [ On, SetupMode, Render, AffectsSim ]
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
-													 { true, true,   true,   true },	// Everything On
-											   		 {  true, false, false, true  },
-											   		 { true, true, false,	 true }};	// Hidden w/ no setup, sparse sampling
+													 { true,  true,  true,  true  },	// Everything On
+											   		 { true,  false, false, true  },
+											   		 { true,  true,  false, true }};	// Hidden w/ no setup, sparse sampling
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
@@ -133,6 +133,32 @@ public class Set {
 	public static final int FISH_MinSize = 5;
 	public static final int FISH_MaxTurnAngle = 60;
 	
+	
+	// These settings are for the fish spritesheets.  The rows and cols are not perfect, so the images
+	// will need some tweaking.  Sorry about the paths, it made my computer happy...
+	public static final String FISH1_Path = "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png";
+	public static final int FISH1_Rows = 7;
+	public static final int FISH1_Cols = 5;
+	public static final float FISH1_Scale = (float)0.7;
+	
+	public static final String FISH2_Path = "/Users/vestibule/java_workspace/Boids/images/spritesheet.png";
+	public static final int FISH2_Rows = 8;
+	public static final int FISH2_Cols = 8;
+	public static final float FISH2_Scale = (float)0.8;
+	
+	public static final String FISH3_Path = "/Users/vestibule/java_workspace/Boids/images/cube.png";
+	public static final int FISH3_Rows = 5;
+	public static final int FISH3_Cols = 6;
+	public static final float FISH3_SCALE = (float)2;
+	
+	public static final String FISH4_Path = "/Users/vestibule/java_workspace/Boids/images/gunman.png";
+	public static final int FISH4_Rows = 9;
+	public static final int FISH4_Cols = 5;
+	public static final float FISH4_SCALE = (float)1.2;
+	
+
+
+
 											  // Body RGB   Head RGB
 	public static final int[][] FISH_Styles = {{ 180,10,0,  180,120,0 },  // Red
 		   									   { 100,100,255,  255,200,0 },	  // Blue
