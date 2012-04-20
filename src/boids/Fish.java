@@ -113,8 +113,8 @@ public class Fish extends Boid implements Aware, Flockable {
 				accelLocal.y = ((accelLocal.y < 0) ? -1 : 1) * Math.abs(accelLocal.x);
 				
 				// TODO put in settings for min coasting speed
-				// If we are turning extremely slowly (and we're here because we want to turn hard),
-				// speed up so we can turn
+				// If we are turning extremely slowly (and we're here because accel is turning hard),
+				// speed up so we can go somewhere. Sort of min flee acceleration
 				if( accelLocal.mag() < Set.FISH_MaxAccel/3 ) {
 					accelLocal.normalize();
 					accelLocal.mult( Set.FISH_MaxAccel/3 );
