@@ -71,7 +71,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 			COLOR_OFFSETS[color] = simul.registerColors( createColors(color) );
 		}
 		
-		sprites = simul.loadSprites("../bin/fish0%d.png",5);
+		//sprites = simul.loadSprites("../bin/fish0%d.png",5);
 	}
 
 	public Fish( PVector position, PVector speed, Sim s, int color ) {

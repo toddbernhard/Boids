@@ -74,7 +74,7 @@ public class Set {
 	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
 	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
-	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
+	public static final int 	KINECT_CalibrationLevel = 500;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
 	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
