@@ -2,20 +2,23 @@ package boids;
 
 import interfaces.Aware;
 import interfaces.Flockable;
+import interfaces.HasSprites;
 
 import java.util.ArrayList;
 
 import kinect.Kinect;
 
-import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PVector;
+import processing.core.PImage;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;
+import sprites.S4P;
 
 
-public class Fish extends Boid implements Aware, Flockable {
-	
+public class Fish extends Boid implements Aware, Flockable, HasSprites {
+		
 	public static final Boid.Type TYPE = Boid.Type.FISH;
 	
 	// Indices for the different styles
@@ -45,6 +48,7 @@ public class Fish extends Boid implements Aware, Flockable {
 	
 	public int head_color;
 	public int style;
+	public static ArrayList<PImage> sprites;
 	
 	public Fish( PVector position, PVector speed, int size, Sim simul, int color ) {
 		super(position, speed, size);
@@ -66,8 +70,10 @@ public class Fish extends Boid implements Aware, Flockable {
 		if(COLOR_OFFSETS[color] == null) {
 			COLOR_OFFSETS[color] = simul.registerColors( createColors(color) );
 		}
+		
+		sprites = simul.loadSprites("../bin/fish0%d.png",5);
 	}
-	
+
 	public Fish( PVector position, PVector speed, Sim s, int color ) {
 		this( position, speed, 7, s, color );
 	}	
@@ -85,7 +91,7 @@ public class Fish extends Boid implements Aware, Flockable {
 	 * during this timestep 
 	 */
 	@Override
-	public void step( ArrayList<Boid> school ) {
+	public int step( ArrayList<Boid> school ) {
 	//public void update( PVector accel ) {
 		
 		PVector accel = calculateAccel( school );
@@ -95,7 +101,7 @@ public class Fish extends Boid implements Aware, Flockable {
 		// If accel == null, skip down to end
 		if( accel != null ) {
 			
-			PVector accelLocal = Fish.matrixMult( Fish.inverse(basis), accel );
+			PVector accelLocal = matrixMult( Fish.inverse(basis), accel );
 				// accelLocal is now a cordinate vector in the fish's local coordinate system,
 				// defined by the fish's basis			
 			
@@ -133,7 +139,7 @@ public class Fish extends Boid implements Aware, Flockable {
 			}
 			
 			// Update recentAccel.  basis * accelLocal -> accel in global
-			recentAccel = Fish.matrixMult(basis, accelLocal); 	
+			recentAccel = matrixMult(basis, accelLocal); 	
 			
 			// update speed. 
 			speed.add( recentAccel );
@@ -167,6 +173,9 @@ public class Fish extends Boid implements Aware, Flockable {
 		// Update opacity
 		color = Sim.colors.get( COLOR_OFFSETS[style]+(Sim.frameCounter+FRAME_OFFSET)%Set.FISH_ShimmerCycle );
 		head_color = Sim.colors.get( Set.FISH_ShimmerCycle+COLOR_OFFSETS[style]+(Sim.frameCounter+FRAME_OFFSET)%Set.FISH_ShimmerCycle );
+		
+		// no change in school
+		return 0;
 	}
 	
 	/*
@@ -267,14 +276,14 @@ public class Fish extends Boid implements Aware, Flockable {
 		}
 		
 		// Use pointCloud if we should
-		if( Set.kinect_AffectsSim ) {
+		if( Set.KINECT_On && Set.kinect_AffectsSim ) {
 			Kinect kinect = Sim.kinect;
 			for( i=0; i<kinect.goodPixels.length; i++ ) {
 				if( kinect.pointCloud[kinect.goodPixels[i]] ) {
 					displaceVector.x = position.x - kinect.mapKinectToSim_Col[kinect.goodPixels[i]%640];
 					displaceVector.y = position.y - kinect.mapKinectToSim_Row[kinect.goodPixels[i]/640];
 					if( displaceVector.mag() < AWARE_RADIUS ) {
-						displaceVector.div(4);
+						displaceVector.mult(kinect.pointCloudRepulsionMulti);
 						avoidance.add( displaceVector );
 					}
 				}
@@ -291,8 +300,8 @@ public class Fish extends Boid implements Aware, Flockable {
 			cohesion.sub( position ); // subtract
 			
 			//cohesion.normalize();
-			//cohesion.mult( Fish.Set.FISH_MaxSpeed );
-			//cohesion.sub( fish.speed );
+			//cohesion.mult( Set.FISH_MaxSpeed );
+			//cohesion.sub( speed );
 			//cohesion.normalize();
 			
 			// Alignment  == avg[ velocity ] - (actual velocity)
@@ -313,6 +322,178 @@ public class Fish extends Boid implements Aware, Flockable {
 		return PVector.add( separation, avoidance );
 	}
 	
+	@Override
+	public void drawBoid(Sim sim) {
+		//============DISPLAY EXTRAS============
+		// We draw the awareness circle first so it is under the fish
+		if (Set.SHOW_Awareness) {
+			sim.stroke(255, 0, 0);
+			sim.fill(255, 0, 0, 25);
+			sim.ellipse(position.x, position.y,
+					2 * AWARE_RADIUS, 2 * AWARE_RADIUS);
+		}
+		if (Set.SHOW_AwarenessCone) {
+			sim.stroke(255, 0, 0);
+			sim.fill(255, 0, 0, 25);
+
+			PVector cone[] = {
+					new PVector(0, -1 * AWARE_CONE_WIDTH_MAX),
+					new PVector(AWARE_CONE_LENGTH, -1 * AWARE_CONE_WIDTH_MIN),
+					new PVector(AWARE_CONE_LENGTH, AWARE_CONE_WIDTH_MIN),
+					new PVector(0, AWARE_CONE_WIDTH_MAX) };
+
+			cone = Boid.matrixMultParallel(basis, cone);
+
+			sim.beginShape();
+			sim.vertex(position.x + cone[0].x, position.y + cone[0].y);
+			sim.vertex(position.x + cone[1].x, position.y + cone[1].y);
+			sim.vertex(position.x + cone[2].x, position.y + cone[2].y);
+			sim.vertex(position.x + cone[3].x, position.y + cone[3].y);
+			sim.endShape();
+		}
+
+		//=========DRAW FISH===========
+		if( Set.SHOW_Sprites ) {
+			// Code to animate sprites
+			
+			float angle = (float) getHeading();
+			sim.fishSprite.setRot(angle);
+			sim.fishSprite.setXY(position.x, position.y);
+			float totalAccel = recentAccel.mag();
+			
+			if(totalAccel < 1)
+			{
+				sim.fishSprite.setFrame(Sim.frameCounter/6 % 5);
+			}
+			else if(totalAccel < 2)
+			{
+				sim.fishSprite.setFrame(Sim.frameCounter/3 % 5);
+			}
+			else
+			{
+				sim.fishSprite.setFrame(Sim.frameCounter % 5);
+			}
+			//fishSprite.setZorder(frameCounter%62);
+			S4P.drawSprites();
+		
+			
+		} else {
+			// Code to draw the fish from scratch
+			
+			// head are the three points that define the head
+			PVector head[] = {
+					new PVector((float) (H_WIDTH * Math.cos(getHeading()
+							+ PConstants.PI / 2)),
+							(float) (H_WIDTH * Math.sin(getHeading() + PConstants.PI / 2))),
+					new PVector(
+							(float) (H_LENGTH * Math.cos(getHeading())),
+							(float) (H_LENGTH * Math.sin(getHeading()))),
+					new PVector((float) (H_WIDTH * Math.cos(getHeading()
+							- PConstants.PI / 2)),
+							(float) (H_WIDTH * Math.sin(getHeading() - PConstants.PI / 2))) };
+
+			
+			// Scales the width of head inversely and length directly with %speed
+			float fracSpeed = (float) speed.mag() / getMAX_SPEED();
+
+			if (speed.mag() > 1) {
+				head[0].mult(1.1f - .3f * fracSpeed);
+				head[1].mult(.9f + .5f * fracSpeed);
+				head[2].mult(1.1f - .3f * fracSpeed);
+			}
+
+			// tail are the two points that define the tail
+			PVector tail[] = {
+					new PVector((float) (T_LENGTH * Math.cos(getHeading()
+										+ PConstants.PI / 2 + T_ANGLE)),
+								(float) (T_LENGTH * Math.sin(getHeading()
+										+ PConstants.PI / 2 + T_ANGLE))),
+					new PVector((float) (T_LENGTH * Math.cos(getHeading()
+										- PConstants.PI / 2 - T_ANGLE)),
+								(float) (T_LENGTH * Math.sin(getHeading()
+										- PConstants.PI / 2 - T_ANGLE))) };
+
+		/*
+		 * PVector accel = recentAccel;
+		 * 
+		 * 
+		 * if( accel != null ) { accel =
+		 * Boid.matrixMult(Boid.inverse(basis), recentAccel );
+		 * accel.normalize(); accel.mult((float)T_LENGTH/2); if( accel.x >
+		 * 0 ) { accel.x = - accel.x; } accel.y *= .5f; //if( accel.x >
+		 * -.5f*T_LENGTH ) { // accel.x = (float) (-.5*T_LENGTH); //}
+		 * } else { accel = new PVector( -1, 0 ); } accel =
+		 * Boid.matrixMult(basis, accel);
+		 * 
+		 * //PVector accel = recentAccel; PVector tail[] = { PVector.sub(
+		 * accel, head[2] ), PVector.sub( accel, head[0] ) };
+		 * 
+		 * tail[0].normalize(); tail[1].normalize(); tail[0].mult( (float)
+		 * T_LENGTH ); tail[1].mult( (float) T_LENGTH );
+		 */
+
+		
+			// Draw head
+			sim.fill(head_color);
+			sim.stroke(head_color);
+
+			// Connect the dots
+			sim.beginShape();
+			sim.vertex((int) (position.x + head[0].x),
+					(int) (position.y + head[0].y));
+			sim.vertex((int) (position.x + head[1].x),
+					(int) (position.y + head[1].y));
+			sim.vertex((int) (position.x + head[2].x),
+					(int) (position.y + head[2].y));
+			sim.vertex((int) (position.x + head[0].x),
+					(int) (position.y + head[0].y));
+			sim.endShape();
+
+			// Draw body
+			sim.fill(color);
+			sim.stroke(color);
+
+			// Connect the dots
+			sim.beginShape();
+			sim.vertex((int) (position.x + head[0].x),
+					(int) (position.y + head[0].y));
+			sim.vertex((int) (position.x + head[2].x),
+					(int) (position.y + head[2].y));
+			sim.vertex((int) (position.x + tail[0].x),
+					(int) (position.y + tail[0].y));
+			sim.vertex((int) (position.x + tail[1].x),
+					(int) (position.y + tail[1].y));
+			sim.vertex((int) (position.x + head[0].x),
+					(int) (position.y + head[0].y));
+			sim.endShape();
+
+		}
+		// END DRAW FISH	
+		
+		//====DISPLAY EXTRAS====
+		// Draws each fish's basis vectors
+		if (Set.SHOW_Bases) {
+			sim.stroke(255, 255, 0);
+			sim.line(position.x, position.y, position.x + 20
+					* basis[0].x, position.y + 20 * basis[0].y);
+			sim.line(position.x, position.y, position.x + 15
+					* basis[1].x, position.y + 15 * basis[1].y);
+		}
+
+		// Draws each fish's acceleration and velocity vectors
+		if (Set.SHOW_KinematicVectors) {
+			sim.stroke(255, 255, 0);
+			sim.line(position.x, position.y, position.x + 10
+					* speed.x, position.y + 10 * speed.y);
+			if (recentAccel != null) {
+				sim.stroke(0, 0, 255);
+				sim.line(position.x, position.y, position.x + 35
+						* recentAccel.x, position.y + 35
+						* recentAccel.y);
+			}
+		}
+
+	}
 	public static int[][] createColors( int style ){
 		
 		// if COLOR_OFFSET is already set, we don't need to do it again
@@ -326,7 +507,7 @@ public class Fish extends Boid implements Aware, Flockable {
 			answer[i][1] = Set.FISH_Styles[style][1];
 			answer[i][2] = Set.FISH_Styles[style][2];
 			answer[i][3] = (int) (255-Set.FISH_ShimmerDepth + Set.FISH_ShimmerDepth * Math.abs( ( Math.cos(
-									Boid.redoRangeERROR( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
+									Boid.redoRangeERROR( i, 0, (float) (2*PConstants.PI), 0, Set.FISH_ShimmerCycle )
 								  		) ) ) );
 		}
 		
@@ -335,7 +516,7 @@ public class Fish extends Boid implements Aware, Flockable {
 			answer[i][1] = Set.FISH_Styles[style][4];
 			answer[i][2] = Set.FISH_Styles[style][5];
 			answer[i][3] = (int) (255-Set.FISH_ShimmerDepth + Set.FISH_ShimmerDepth * Math.abs( ( Math.cos(
-									Boid.redoRangeERROR( i, 0, (float) (2*Math.PI), 0, Set.FISH_ShimmerCycle )
+									Boid.redoRangeERROR( i, 0, (float) (2*PConstants.PI), 0, Set.FISH_ShimmerCycle )
 								  		) ) ) );
 		}
 		return answer;

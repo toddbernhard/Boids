@@ -31,7 +31,7 @@ public class Obstacle extends Boid {
 	}
 
 	@Override
-	public void step(ArrayList<Boid> school) {
+	public int step(ArrayList<Boid> school) {
 		
 		position.add( speed );
 		
@@ -66,70 +66,10 @@ public class Obstacle extends Boid {
 			speed.add( (Sim.rand.nextFloat()-.5f)*Set.OBSTACLE_TargetSize, (Sim.rand.nextFloat()-.5f)*Set.OBSTACLE_TargetSize, 0);
 			speed.normalize();
 			speed.mult( Boid.redoRangeERROR( Sim.rand.nextFloat(), Set.OBSTACLE_MinSpeed, Set.OBSTACLE_MaxSpeed) );
-			
-			/*
-			int i = rand.nextInt(8);
-			
-			switch( i ) {
-			case 0: // NORTH
-				position.x = SCREEN_WIDTH/2;
-				position.y = 0;
-				speed.x = 0;
-				speed.y = OBSTACLE_SPEED;
-				break;
-			case 1: // EAST
-				position.x = SCREEN_WIDTH;
-				position.y = SCREEN_HEIGHT/2;
-				speed.x = -OBSTACLE_SPEED;
-				speed.y = 0;
-				break;
-			case 2: // SOUTH
-				position.x = SCREEN_WIDTH/2;
-				position.y = SCREEN_HEIGHT;
-				speed.x = 0;
-				speed.y = -OBSTACLE_SPEED;
-				break;
-			case 3: // WEST
-				position.x = 0;
-				position.y = SCREEN_HEIGHT/2;
-				speed.x = OBSTACLE_SPEED;
-				speed.y = 0;
-				break;
-			case 4: // NORTH EAST
-				position.x = SCREEN_WIDTH;
-				position.y = 0;
-				speed.x = -SCREEN_WIDTH;
-				speed.y = SCREEN_HEIGHT;
-				speed.normalize();
-				speed.mult( 2*OBSTACLE_SPEED );
-				break;
-			case 5: // SOUTH EAST
-				position.x = SCREEN_WIDTH;
-				position.y = SCREEN_HEIGHT;
-				speed.x = -SCREEN_WIDTH;
-				speed.y = -SCREEN_HEIGHT;
-				speed.normalize();
-				speed.mult( 2*OBSTACLE_SPEED );
-				break;
-			case 6: // SOUTH WEST
-				position.x = 0;
-				position.y = SCREEN_HEIGHT;
-				speed.x = SCREEN_WIDTH;
-				speed.y = -SCREEN_HEIGHT;
-				speed.normalize();
-				speed.mult( 2*OBSTACLE_SPEED );
-				break;
-			case 7: // NORTH WEST
-				position.x = 0;
-				position.y = 0;
-				speed.x = SCREEN_WIDTH;
-				speed.y = SCREEN_HEIGHT;
-				speed.normalize();
-				speed.mult( 2*OBSTACLE_SPEED );
-				break;
-			}
-			*/
 		}
+		
+		// no change in school
+		return 0;
 	}
 
 	@Override
@@ -150,5 +90,13 @@ public class Obstacle extends Boid {
 	@Override
 	public float getMIN_SPEED() {
 		return Set.OBSTACLE_MinSpeed;
+	}
+
+	@Override
+	public void drawBoid(Sim sim) {
+		sim.stroke(0);
+		sim.fill(150, 0, 0);
+
+		sim.ellipse(position.x, position.y, size, size);
 	}
 }

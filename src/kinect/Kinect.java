@@ -34,19 +34,19 @@ public class Kinect {
 	public boolean[] pointCloud; // if KINECT_AffectsSim, pixels are true if object present
 
 	
+	public KinectConfig config; // handle for KinectConfig, if in Setup mode
 	public int[] goodPixels; // pixels to use in simulation (with or without
 								// filters applied)
 	public boolean filter = true; // filter out pixels w/ high stddev
 	public float filterThreshold = Set.KINECT_DefaultFilter; // filters out pixels w/ a stddev > threshold;
 	public int range = -4400;
 	public int rangeSize = 4000;
+	public float pointCloudRepulsionMulti = 0.1f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
 
 	public int[] mapKinectToSim_Col = new int[640]; // Each col of Kinect depth image corresponds to a col of Sim screen
 	public int[] mapKinectToSim_Row = new int[480]; // Each row        "         "          "          row      "
 	
 	public int[] mapDepthToColor;
-			
-	public KinectConfig config; // handle for KinectConfig, if in Setup mode
 
 	public int alphaChannel = 200;
 

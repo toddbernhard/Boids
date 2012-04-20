@@ -52,9 +52,12 @@ public abstract class Boid {
 	
 	/*
 	 * Makes all the changes of a timestep. Accel is the acceleration vector on the fish
-	 * during this timestep 
+	 * during this timestep. Returns net change in size of school during the step.
+	 * EX. nothing changed == 0 (most), food is eaten == -1, new fish spawned == +#new, etc 
 	 */
-	public abstract void step( ArrayList<Boid> flock );
+	public abstract int step( ArrayList<Boid> flock );
+	
+	public abstract void drawBoid(Sim sim);
 	
 	public abstract Boid.Type getTYPE();
 	public abstract float getMAX_ACCEL();

@@ -51,7 +51,7 @@ public class Food extends Boid {
 	}
 
 	@Override
-	public void step(ArrayList<Boid> flock) {
+	public int step(ArrayList<Boid> flock) {
 	
 		speed.add( (Sim.rand.nextFloat()*2-1)*Set.FOOD_MaxAccel, (Sim.rand.nextFloat()*2-1)*Set.FOOD_MaxAccel, 0 );
 		
@@ -77,6 +77,21 @@ public class Food extends Boid {
 			}
 		}
 		
+		if( eaten ) {
+			flock.remove(this);
+			return -1; //removed boid from flock
+		}
+		
+		return 0; // no change to school
+		
+		
 	}
 
+	@Override
+	public void drawBoid(Sim sim) {
+		sim.stroke(180, 150, 0);
+		sim.fill(180, 150, 0);
+		sim.ellipse(position.x, position.y, size, 2 * size);
+
+	}
 }

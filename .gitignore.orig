@@ -1,0 +1,9 @@
+$ cat .gitignore
+bin/
+<<<<<<< HEAD
+.DS_Store
+src/.DS_Store
+=======
+.classpath
+
+>>>>>>> Win64

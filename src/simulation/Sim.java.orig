@@ -1,6 +1,5 @@
 package simulation;
 
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,60 +7,68 @@ import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
+import java.lang.Math;
 
 import processing.core.*;
-import processing.opengl.*;
-import javax.media.opengl.GL;
-
-import boids.*;
-import sprites.*;
 
 import kinect.Kinect;
 import kinect.KinectConfig;
 
+import processing.opengl.*;
+import javax.media.opengl.*;
 
-@SuppressWarnings("serial")
-public class Sim extends PApplet{
+import sprites.*;
+
+import boids.Fish;
+import boids.Food;
+import boids.Obstacle;
+import boids.Person;
+import boids.Shark;
+
+
+public class Sim extends PApplet {
 
 	public static int frameCounter; // Used for animation and color cycles.
 									// Shadows p5's frameCount, but is public
-	
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
-											 // Boids register their colors on spawn.
-	
-	// TODO make this more dynamic, put in settings too
-	public Sprite fishSprite;
+												// Boids register their colors
+												// on spawn.
+
+	public Sprite fishSprite = new Sprite(this, "E:/Storage/Programs/myPrograms/Boids/images/ninjaMan.png", 7, 5, 0);
 	
 	public ArrayList<Boid> school;
+	public static Kinect kinect;
 
-	public static Kinect kinect; // kinect handle
+	private int[][] pointCloud;
 
-	// OpenGL shader stuff
 	String vertexSource;
 	String fragmentSource;
+
 	int shaderProgram;
 	float time;
 
 	@Override
 	public void setup() {
+
+		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL); // Set the screen
+															// size
+		colorMode(RGB, 255);
+
+		fishSprite.setFrameSequence(0, 24);
+		fishSprite.setAnimInterval(.05);
+		float scale = (float)0.5;
+		fishSprite.setScale(scale);
 		frameRate(30);
 		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 				
 		frameCounter = 0;
+		//animCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 
-		if( Set.SHOW_Sprites ) {
-			fishSprite = new Sprite(this, "/Users/vestibule/java_workspace/Boids/images/ninjaMan.png", 7, 5, 0);
-			fishSprite.setFrameSequence(0, 24);
-			fishSprite.setAnimInterval(.05);
-			float scale = (float)0.5;
-			fishSprite.setScale(scale);
-		}
-		
 		if (Set.KINECT_On) {
 			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
 			kinect.init();
@@ -169,6 +176,7 @@ public class Sim extends PApplet{
 
 	@Override
 	public void draw() {
+		
 		// Display StdDev Adjust mode for Kinect
 		if (Set.KINECT_SetupMode
 				&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
@@ -183,6 +191,7 @@ public class Sim extends PApplet{
 					point(kinect.mapKinectToSim_Col[i % 640],
 							kinect.mapKinectToSim_Row[i / 640]);
 				}
+
 			}
 		} else
 
@@ -211,45 +220,19 @@ public class Sim extends PApplet{
 			 */
 
 			for (int i = 0; i < school.size(); i++) {
-				i += school.get(i).step(school);
-				school.get(i).drawBoid(this);
-				//drawBoid(school.get(i));
+				school.get(i).step(school);
+				drawBoid(school.get(i));
 			}
 
-			// Render the kinect if we should 
+			// Display Range Adjust mode for Kinect 
 			int color_index;
-			if (Set.KINECT_SetupMode
-					&& (Set.kinect_Render || kinect.config.mode == KinectConfig.MODE_RangeAdjust)) {
+			if (Set.KINECT_On && (Set.kinect_Render ||
+					(Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust) )) {
 
 				for (int i = 0; i < kinect.goodPixels.length; i++) {
 
-					color_index = (int) Boid.redoRange(
-							kinect.diffMap[kinect.goodPixels[i]], 0,
-							Kinect.NUM_COLORS, kinect.range, kinect.range
-									+ kinect.rangeSize);
-
-					if( kinect.config.showBackground ) {
-						if (kinect.diffMap[kinect.goodPixels[i]] < kinect.range ) {
-							color_index = 0;
-						} else if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize) {
-							color_index = Kinect.NUM_COLORS;
-						}
-					} else if( kinect.diffMap[kinect.goodPixels[i]] < kinect.range ||
-							   kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize ) {
-						continue;
-					}
-					stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
-
-					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i] % 640],
-							kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
-				}
-			} else if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
-
-				for (int i = 0; i < kinect.goodPixels.length; i++) {
-
-					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range
-							&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range
-									+ kinect.rangeSize) {
+					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range 
+								&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range+kinect.rangeSize) {
 						if (kinect.depthMap[kinect.goodPixels[i]] < Kinect.DEPTH_MIN) {
 							color_index = 0;
 						} else if (kinect.depthMap[kinect.goodPixels[i]] > Kinect.DEPTH_MAX) {
@@ -264,25 +247,29 @@ public class Sim extends PApplet{
 								kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
 					}
 				}
+			}
 		}
 
 		
+<<<<<<< HEAD
 		// SLOW, TODO maybe cache a loop
 		if (Set.JOGL_RenderShaders) {
 			renderShaders();
+=======
+			frameCounter++;
+			animCounter = frameCounter/3;
+		
+>>>>>>> Win64
 		}
-
-		frameCounter++;
 
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
 		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
-			for (int i = 0; i < Set.SCREEN_Width; i++) {
-				stroke(colors.get(Kinect.COLOR_OFFSET
-						+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
-								Set.SCREEN_Width)));
-				line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
-			}
+		for (int i = 0; i < Set.SCREEN_Width; i++) {
+			stroke(colors.get(Kinect.COLOR_OFFSET
+					+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
+							Set.SCREEN_Width)));
+			line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
 		}
 
 	}
@@ -299,20 +286,12 @@ public class Sim extends PApplet{
 			System.out.println(Set.paused ? "PAUSE" : "PLAY");
 			return;
 		case 'a':
-			if( Set.KINECT_On ) {
-				Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
-				System.out.println(Set.kinect_AffectsSim ? "sim using kinect" : "sim ignoring kinect");
-			} else {
-				System.out.println("kinect isn't initialized");
-			}
+			Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
+			System.out.println(Set.kinect_AffectsSim ? "sim using kinect" : "sim ignoring kinect");
 			return;
 		case 's':
-			if( Set.KINECT_On && Set.KINECT_INIT_Render ) {
-				Set.kinect_Render = !Set.kinect_Render;
-				System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
-			} else {
-				System.out.println("kinect isn't initialized");
-			}
+			Set.kinect_Render = !Set.kinect_Render;
+			System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
 			return;
 		}
 		if (keyCode == ESC) {
@@ -336,13 +315,246 @@ public class Sim extends PApplet{
 		if (mouseButton == LEFT) {
 			Food f = new Food(mouseX, mouseY);
 			school.add(f);
-			f.drawBoid(this);
+			drawFood(f);
 		} else if (mouseButton == RIGHT) {
 			Set.paused = !Set.paused;
 		}
 
 	}
 
+	private void drawBoid(Boid boid) {
+
+		switch (boid.getTYPE()) {
+
+		// case YELLOW_FISH: drawYellowFish( (YellowFish) boid); break;
+		case FISH:
+			drawFish((Fish) boid);
+			break;
+
+		case OBSTACLE:
+			if (Set.SHOW_Obstacle) {
+				drawObstacle((Obstacle) boid);
+			}
+			break;
+
+		case PERSON:
+			drawPerson((Person) boid);
+			break;
+		case SHARK:
+			drawShark((Shark) boid);
+			break;
+
+		case FOOD:
+			drawFood((Food) boid);
+			break;
+
+		}
+	}
+
+	private void drawObstacle(Obstacle obst) {
+		stroke(0);
+		fill(150, 0, 0);
+
+		ellipse(obst.position.x, obst.position.y, obst.size, obst.size);
+	}
+
+	private void drawPerson(Person obst) {
+		stroke(0);
+		fill(200);
+
+		ellipse(obst.position.x, obst.position.y, obst.size, obst.size);
+	}
+
+	/*
+	 * Simply draws the fish
+	 */
+	private void drawFish(Fish fish) {
+
+		// We draw the awareness circle first so it is under the fish
+		if (Set.SHOW_Awareness) {
+			stroke(255, 0, 0);
+			fill(255, 0, 0, 25);
+			ellipse(fish.position.x, fish.position.y,
+					2 * fish.getAWARE_RADIUS(), 2 * fish.getAWARE_RADIUS());
+		}
+		if (Set.SHOW_AwarenessCone) {
+			stroke(255, 0, 0);
+			fill(255, 0, 0, 25);
+
+			PVector cone[] = {
+					new PVector(0, -1 * fish.AWARE_CONE_WIDTH_MAX),
+					new PVector(fish.AWARE_CONE_LENGTH, -1
+							* fish.AWARE_CONE_WIDTH_MIN),
+					new PVector(fish.AWARE_CONE_LENGTH,
+							fish.AWARE_CONE_WIDTH_MIN),
+					new PVector(0, fish.AWARE_CONE_WIDTH_MAX) };
+
+			cone = Boid.matrixMultParallel(fish.basis, cone);
+
+			beginShape();
+			vertex(fish.position.x + cone[0].x, fish.position.y + cone[0].y);
+			vertex(fish.position.x + cone[1].x, fish.position.y + cone[1].y);
+			vertex(fish.position.x + cone[2].x, fish.position.y + cone[2].y);
+			vertex(fish.position.x + cone[3].x, fish.position.y + cone[3].y);
+			endShape();
+		}
+
+		// / DRAW FISH
+		// head are the three points that define the head
+		PVector head[] = {
+				new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
+						+ PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
+						.getHeading() + PI / 2))),
+				new PVector(
+						(float) (fish.H_LENGTH * Math.cos(fish.getHeading())),
+						(float) (fish.H_LENGTH * Math.sin(fish.getHeading()))),
+				new PVector((float) (fish.H_WIDTH * Math.cos(fish.getHeading()
+						- PI / 2)), (float) (fish.H_WIDTH * Math.sin(fish
+						.getHeading() - PI / 2))) };
+
+		// Scales the width of head inversely and length directly with %speed
+
+		float fracSpeed = (float) fish.speed.mag() / fish.getMAX_SPEED();
+
+		if (fish.speed.mag() > 1) {
+			head[0].mult(1.1f - .3f * fracSpeed);
+			head[1].mult(.9f + .5f * fracSpeed);
+			head[2].mult(1.1f - .3f * fracSpeed);
+		}
+
+		// tail are the two points that define the tail
+
+		PVector tail[] = {
+				new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
+						+ PI / 2 + fish.T_ANGLE)),
+						(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
+								+ PI / 2 + fish.T_ANGLE))),
+				new PVector((float) (fish.T_LENGTH * Math.cos(fish.getHeading()
+						- PI / 2 - fish.T_ANGLE)),
+						(float) (fish.T_LENGTH * Math.sin(fish.getHeading()
+								- PI / 2 - fish.T_ANGLE))) };
+
+		/*
+		 * PVector accel = fish.recentAccel;
+		 * 
+		 * 
+		 * if( accel != null ) { accel =
+		 * Boid.matrixMult(Boid.inverse(fish.basis), fish.recentAccel );
+		 * accel.normalize(); accel.mult((float)Fish.T_LENGTH/2); if( accel.x >
+		 * 0 ) { accel.x = - accel.x; } accel.y *= .5f; //if( accel.x >
+		 * -.5f*Fish.T_LENGTH ) { // accel.x = (float) (-.5*Fish.T_LENGTH); //}
+		 * } else { accel = new PVector( -1, 0 ); } accel =
+		 * Boid.matrixMult(fish.basis, accel);
+		 * 
+		 * //PVector accel = fish.recentAccel; PVector tail[] = { PVector.sub(
+		 * accel, head[2] ), PVector.sub( accel, head[0] ) };
+		 * 
+		 * tail[0].normalize(); tail[1].normalize(); tail[0].mult( (float)
+		 * Fish.T_LENGTH ); tail[1].mult( (float) Fish.T_LENGTH );
+		 */
+
+<<<<<<< HEAD
+=======
+		//PVector accel = fish.recentAccel;
+		PVector tail[] = { PVector.sub( accel, head[2] ),
+						   PVector.sub( accel, head[0] ) };
+		
+		tail[0].normalize();
+		tail[1].normalize();
+		tail[0].mult( (float) Fish.T_LENGTH );
+		tail[1].mult( (float) Fish.T_LENGTH );
+		*/
+		
+		/*
+>>>>>>> Win64
+		// Draw head
+		fill(fish.head_color);
+		stroke(fish.head_color);
+
+		// Connect the dots
+		beginShape();
+		vertex((int) (fish.position.x + head[0].x),
+				(int) (fish.position.y + head[0].y));
+		vertex((int) (fish.position.x + head[1].x),
+				(int) (fish.position.y + head[1].y));
+		vertex((int) (fish.position.x + head[2].x),
+				(int) (fish.position.y + head[2].y));
+		vertex((int) (fish.position.x + head[0].x),
+				(int) (fish.position.y + head[0].y));
+		endShape();
+
+		// Draw body
+		fill(fish.color);
+		stroke(fish.color);
+
+		// Connect the dots
+		beginShape();
+		vertex((int) (fish.position.x + head[0].x),
+				(int) (fish.position.y + head[0].y));
+		vertex((int) (fish.position.x + head[2].x),
+				(int) (fish.position.y + head[2].y));
+		vertex((int) (fish.position.x + tail[0].x),
+				(int) (fish.position.y + tail[0].y));
+		vertex((int) (fish.position.x + tail[1].x),
+				(int) (fish.position.y + tail[1].y));
+		vertex((int) (fish.position.x + head[0].x),
+				(int) (fish.position.y + head[0].y));
+		endShape();
+<<<<<<< HEAD
+		// / END DRAW FISH
+
+=======
+		/// END DRAW FISH
+		*/
+		rand = new Random();
+		//animation1.display(fish.position.x, fish.position.y, fish.position.x, fish.position.y);
+		//image(fishpic, fish.position.x, fish.position.y);
+		float angle = atan2(fish.speed.x, fish.speed.y);
+		fishSprite.setRot(angle);
+		fishSprite.setXY(fish.position.x, fish.position.y);
+		//fishSprite.setFrame((int)( Math.sqrt( (fish.speed.x*fish.speed.x) + (fish.speed.y * fish.speed.y) )) % 3 );
+		double totalAccel = Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y));
+		System.out.print(Math.sqrt( (fish.recentAccel.x*fish.recentAccel.x) + (fish.recentAccel.y * fish.recentAccel.y) )+"\n");
+		
+		if(totalAccel < 1)
+		{
+			fishSprite.setFrame(animCounter/2 % 5);
+		}
+		else if(totalAccel < 2)
+		{
+			fishSprite.setFrame(animCounter % 5);
+		}
+		else
+		{
+			fishSprite.setFrame(frameCounter % 5);
+		}
+		//fishSprite.setZorder(frameCounter%62);
+		S4P.drawSprites();
+		
+>>>>>>> Win64
+		// Draws each fish's basis vectors
+		if (Set.SHOW_Bases) {
+			stroke(255, 255, 0);
+			line(fish.position.x, fish.position.y, fish.position.x + 20
+					* fish.basis[0].x, fish.position.y + 20 * fish.basis[0].y);
+			line(fish.position.x, fish.position.y, fish.position.x + 15
+					* fish.basis[1].x, fish.position.y + 15 * fish.basis[1].y);
+		}
+
+		// Draws each fish's acceleration and velocity vectors
+		if (Set.SHOW_KinematicVectors) {
+			stroke(255, 255, 0);
+			line(fish.position.x, fish.position.y, fish.position.x + 10
+					* fish.speed.x, fish.position.y + 10 * fish.speed.y);
+			if (fish.recentAccel != null) {
+				stroke(0, 0, 255);
+				line(fish.position.x, fish.position.y, fish.position.x + 35
+						* fish.recentAccel.x, fish.position.y + 35
+						* fish.recentAccel.y);
+			}
+		}
+
+	}
 
 	/*
 	 * private void group( Fish[] school, ArrayList<ArrayList<Fish>> groups ) {
@@ -397,6 +609,35 @@ public class Sim extends PApplet{
 	 * 
 	 * }
 	 */
+
+	private void drawShark(Shark shark) {
+
+		stroke(shark.color);
+
+		// fill( shark.energyColor );
+		// arc( shark.position.x, shark.position.y, (int) (shark.size*1.5),
+		// (int) (shark.size*1.5), PI, PI+PI/2 );
+
+		// fill( shark.hungerColor );
+		// arc( shark.position.x, shark.position.y, (int) (shark.size*1.5),
+		// (int) (shark.size*1.5), PI+PI/2, TWO_PI );
+
+		fill(shark.color);
+		ellipse(shark.position.x, shark.position.y, shark.size, shark.size);
+
+	}
+
+	private void drawFood(Food food) {
+
+		if (food.eaten == true) {
+			school.remove(food);
+		}
+
+		stroke(180, 150, 0);
+		fill(180, 150, 0);
+		ellipse(food.position.x, food.position.y, food.size, 2 * food.size);
+
+	}
 
 	private float lawOfCos_SideC(float sideA, float angleC, float sideB) {
 		return (float) Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2) - 2
@@ -496,6 +737,13 @@ public class Sim extends PApplet{
 		}
 		return new String(buffer);
 	}
+<<<<<<< HEAD
+
+	public int registerColors(int[][] newColors) {
+		assert (newColors != null);
+=======
+	*/
+	
 	
 	
 	
@@ -546,6 +794,7 @@ public class Sim extends PApplet{
 */
 	public int registerColors( int[][] newColors ) {
 		assert(newColors!=null);
+>>>>>>> Win64
 
 		int startIndex = colors.size();
 

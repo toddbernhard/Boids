@@ -11,7 +11,7 @@ public class KinectConfig {
 	public static final int MODE_Test			= 4;
 	
 	public int mode;
-	public boolean rangeBg;
+	public boolean showBackground;
 	public RunningStat[] stats;
 	
 	private Kinect kinect;
@@ -25,7 +25,7 @@ public class KinectConfig {
 	public void reset() {
 		mode = 0;
 		kinect.filter = false;
-		rangeBg = false;
+		showBackground = false;
 	}
 
 	public void keyPressed(int key, int keyCode) {
@@ -78,8 +78,8 @@ public class KinectConfig {
 			case 'b':
 			case 'B':
 			case '5':
-				rangeBg = !rangeBg;
-				System.out.println(rangeBg ? "rangeBg=ON" : "rangeBg=OFF");
+				showBackground = !showBackground;
+				System.out.println(showBackground ? "rangeBg=ON" : "rangeBg=OFF");
 			case 'f':
 			case 'F':
 			case '4':
