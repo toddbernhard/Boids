@@ -34,12 +34,12 @@ public class Person extends Boid {
 		
 		position.add( speed );
 		
-		if( position.x < 0 || position.x > Set.SCREEN_Width ||
-			position.y < 0 || position.y > Set.SCREEN_Height   ) {
+		if( position.x < 0 || position.x > Set.screen_Width ||
+			position.y < 0 || position.y > Set.screen_Height   ) {
 			
 			float odds = Sim.rand.nextFloat();
 			
-			position.x = Set.SCREEN_Width/3 + Sim.rand.nextInt(Set.SCREEN_Width/3);
+			position.x = Set.screen_Width/3 + Sim.rand.nextInt(Set.screen_Width/3);
 			
 			// 65% come from the top
 			if( odds < .25 ) {
@@ -49,7 +49,7 @@ public class Person extends Boid {
 			// 35% from bottom
 			else {
 			// Entering from BOTTOM
-				position.y = Set.SCREEN_Height;
+				position.y = Set.screen_Height;
 			}
 			
 			speed.x = 2*(Sim.rand.nextFloat()-.5f)*Set.PERSON_HorizSpeedVar;

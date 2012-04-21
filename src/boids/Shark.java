@@ -83,11 +83,11 @@ public class Shark extends Boid {
 		position.add(speed);
 		
 		// Make sure the new position is onscreen; if not, wrap it
-		if( position.x < 0 ) position.x += Set.SCREEN_Width;
-		if( position.y < 0 ) position.y += Set.SCREEN_Height;
+		if( position.x < 0 ) position.x += Set.screen_Width;
+		if( position.y < 0 ) position.y += Set.screen_Height;
 		
-		position.x %= Set.SCREEN_Width;
-		position.y %= Set.SCREEN_Height;
+		position.x %= Set.screen_Width;
+		position.y %= Set.screen_Height;
 		
 		if( hunger < 1 ) hunger += (float) .1;
 		if( energy < 1 ) energy += (float) .1;

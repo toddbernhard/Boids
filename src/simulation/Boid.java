@@ -72,125 +72,21 @@ public abstract class Boid {
 		if( position.x < Set.SCREEN_EdgeWidth ) {
 			accel.x += redoRangeERROR( 1/(float)Math.pow( 1 + position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.SCREEN_Width - position.x < Set.SCREEN_EdgeWidth ) {
-			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+		else if( Set.screen_Width - position.x < Set.SCREEN_EdgeWidth ) {
+			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.screen_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		if( position.y < Set.SCREEN_EdgeWidth ) {
 			accel.y += redoRangeERROR( 1/(float)Math.pow( 1 + position.y, 1), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.SCREEN_Height - position.y < Set.SCREEN_EdgeWidth ) {
-			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+		else if( Set.screen_Height - position.y < Set.SCREEN_EdgeWidth ) {
+			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.screen_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		return accel;
 		
 	}
-	/*
-	public static void group( ArrayList<Boid> school ) {
-		
-		ArrayList<ArrayList<Boid>> groups = new ArrayList<ArrayList<Boid>>();
-		ArrayList<Integer> groupColors = new ArrayList<Integer>();
-		ArrayList<Integer> colorArray = new ArrayList<Integer>();
-		ArrayList<Integer> timesFound = new ArrayList<Integer>();
-		
-		int i,j,k;
-		int max = 0;
-		boolean found;
-		
-		for( Boid boid : school ) {
-			boid.grouped = false;
-		}
-		
-		/*for( i=0; i<boids.size(); i++ ) {
-			if( boids.get(i).grouped == false ) {
-				groups.add( new ArrayList<Boid>() );
-				boids[i].groupHelper( boids, groups.get(groups.size()-1) );
-			}
-		}
-		*/
-		/*
-		for( Boid boid : school ) {
-			if( boid.grouped == false ) {
-				groups.add( new ArrayList<Boid>() );
-				boid.groupHelper( school, groups.get( groups.size()-1) );
-			}
-		}
-		
-		/*
-		for( i=0; i<groups.size(); i++ ) {
-			
-			if( groups.get(i).size() > 1 ) {
-			
-				for( j=0; j<groups.get(i).size(); j++ ) {
-					
-					found = false;
-				
-					for( k=0; k<colorArray.size(); k++ ) {
-						
-						if( groups.get(i).get(j).color == colorArray.get(k) ) {
-							timesFound.set(k, timesFound.get(k)+1 );
-							found = true;
-						}
-					
-					}
-				
-					if( found == false ) {
-					
-						colorArray.add( groups.get(i).get(j).color );
-						timesFound.add( 1 );
-				
-					}
-				}
-			
-				for( j=0; j<timesFound.size(); j++ ) {
-					if( max < timesFound.get(j) ) {
-						max = j;
-					}
-				}
-				
-				if( timesFound.get(max) >= groups.get(i).size()/2 ) {
-					groupColors.add( colorArray.get(max) );
-				} else {
-					groupColors.add( colors[(colorCounter++)%colors.length] );
-				}
-			
-			} else { // groups.get(i).size() == 1
-				groupColors.add( groups.get(i).get(0).color );
-			}
-			
-			
-		}
-		
-		for( i=0; i<groups.size(); i++ ) {
-			for( j=0; j<groups.size(); j++ ) {
-				
-				if( i==j ) {
-					continue;
-				}
-				
-				if( groupColors.get(i) == groupColors.get(j) ) {
-					if( groups.get(i).size() > groups.get(j).size() ) {
-						groupColors.remove(j);
-						groupColors.add( j, colors[(colorCounter++)%colors.length] );
-					} else {
-						groupColors.remove(i);
-						groupColors.add( i, colors[(colorCounter++)%colors.length] );
-					}
-				}
-			}
-		}
-		
-		for( i=0; i<groups.size(); i++ ) {
-			for( j=0; j<groups.get(i).size(); j++ ) {
-			
-				groups.get(i).get(j).color = groupColors.get(i);
-			
-			}
-		}
-		
-	}
-	*/
+
 	
 	protected void groupHelper( ArrayList<Boid> school, ArrayList<Boid> group ) {
 		
@@ -205,8 +101,8 @@ public abstract class Boid {
 			if(    boid.grouped == false
 				//&& PVector.sub(boids[index].speed,    boids[i].speed ).mag() < 5
 				&& (   PVector.sub(position, boid.position ).mag() < 1.5*50
-					|| Math.abs(position.x-boid.position.x-Set.SCREEN_Width) < 3*50
-					|| Math.abs(position.y-boid.position.y-Set.SCREEN_Height) < 3*50 )  ) {
+					|| Math.abs(position.x-boid.position.x-Set.screen_Width) < 3*50
+					|| Math.abs(position.y-boid.position.y-Set.screen_Height) < 3*50 )  ) {
 				
 				boid.groupHelper( school, group);
 				

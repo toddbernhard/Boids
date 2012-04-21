@@ -1,5 +1,8 @@
 package simulation;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 /*
  * Settings
  */
@@ -9,16 +12,16 @@ public class Set {
 	/*========= HOW TO USE ===========
 	 * Play with an *uncommented* config by changing the corresponding array values.
 	 * Add columns or additional arrays as needed, just try not to break previous configs in the process.
-	 * When you find a gopd set of parameters, save it by giving the index a comment.
+	 * When you find a good set of parameters, save it by giving the index a comment.
 	 */
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
 		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//  2; // Old demo 1: no kinect, red fish w/ sharks in small screen
-			3; // Same as 1 but w/ setup mode and dense sampling for renders
-			4; // Sprites test
-		//	5;
+		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
+		//	4; // Sprites test
+			5; // Same as 1, no kinect, fullscreen testing
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
@@ -26,31 +29,35 @@ public class Set {
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
 										   {  800,    600,    50,		0 },
-										   {  800,    600,     0, 	-1 }};
+										   {  800,    600,     0, 		0 }};
 
 	
-	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget, Sprites(vsDrawn)
-	private static final boolean[][] display_toggles =  {{ true, true, true, true, true,  true, true, true },
-														{ false, false, false, false, false,  true, false, false },
-		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, false },
-														{ false, false, false, false, false,  true, false, false },
-														{ false, false, false, false, false,  true, false, true  },
-														{ false, false, false, false, false,  false, false, false }};
+	private static final boolean[][] display_toggles =  
+		//  In order, on/off:
+		// BasisVec, KinematicVec, AwareRadius, AwareCone, Obstacles, ObstTarget, Sprites(vsDrawn), Fullscreen	
+		{{ true, true, true, true, true, true, true,  true, true },
+		 { false, false, false, false,  true, false, false, true },
+		 { false, false, false, false,  true, false, false, false},
+		 { false, false, false, false,  true, false, false, true },
+		 { false, false, false, false,  true, false,  true, false },
+		 { false, false, false, false,  true, false, false, false }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
-	private static final int[][] populations =  {{  20,     20,     20,        20,         2,      2,     4    },
+	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    },
-												{ 40,      40,      40,         40,         0,      0,     4    },
-												{ 350,    150,     50,        20,         0,      0,     0   }};
-				    
+												{ 40,      40,     40,        40,         0,      0,     4    },
+												{ 350,    150,     50,        50,         0,      0,     0    }};
 	
-
-	public static final int SCREEN_Width = 			screen[config_n][0];
-	public static final int SCREEN_Height =			screen[config_n][1];
-	public static final int SCREEN_EdgeWidth =		screen[config_n][2];
-	public static final int SCREEN_FrameRate =		30; // Maximum framerate
+	
+	// TODO NOT FINAL. be careful that we never set these. maybe use getter/setters, but don't want the function call
+	// These two lines check Fullscreen display_toggle: if yes->null, if no->respective setting from this class
+	public static Integer screen_Width  = setScreenSize("width");
+	public static Integer screen_Height =	setScreenSize("height");
+	
+	public static final int SCREEN_EdgeWidth  =	screen[config_n][2];
+	public static final int SCREEN_FrameRate  =	30; // Maximum framerate
 
 	
 	//public static final int 	KINECT_ConfigNumber 	= 2; // override
@@ -82,8 +89,8 @@ public class Set {
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{SCREEN_Width,SCREEN_Height}},  // Initial museum steup
-														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
+	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{screen_Width,screen_Height}},  // Initial museum steup
+														    {{   0,  0 },{screen_Width,screen_Height}} };// Full screen
 	public static final int[][] KINECT_Coord			= KINECT_CoordTable[1];
 
 	
@@ -101,11 +108,11 @@ public class Set {
 	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel
 	public static final boolean SHOW_Awareness =        display_toggles[config_n][2]; // Circle of awareness
 	public static final boolean SHOW_AwarenessCone =    display_toggles[config_n][3]; // Forward cone to avoid things
-	public static final boolean SHOW_Groups =           display_toggles[config_n][4]; // Haven't tested this in a while
-	public static final boolean SHOW_Obstacle =         display_toggles[config_n][5]; // Normally on, but if you want to have invisible obstacles
-	public static final boolean SHOW_ObstacleTarget =   display_toggles[config_n][6]; // The area obstacles aim for when spawned
-	public static final boolean SHOW_Sprites = 			display_toggles[config_n][7]; // Whether we render sprites or draw by procedure
-
+	public static final boolean SHOW_Obstacle =         display_toggles[config_n][4]; // Normally on, but if you want to have invisible obstacles
+	public static final boolean SHOW_ObstacleTarget =   display_toggles[config_n][5]; // The area obstacles aim for when spawned
+	public static final boolean SHOW_Sprites = 			display_toggles[config_n][6]; // Whether we render sprites or draw by procedure
+	public static final boolean SHOW_Fullscreen = 		display_toggles[config_n][7];
+	
 	public static final int NUMBER_FishRed =    populations[config_n][0];
 	public static final int NUMBER_FishBlue =   populations[config_n][1];
 	public static final int NUMBER_FishGreen =  populations[config_n][2];
@@ -210,6 +217,18 @@ public class Set {
 	public static boolean paused				= false;
 	public static boolean kinect_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][1]); // Render the kinect in simulation
 	public static boolean kinect_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
+	
+	
+	// Used to initialize the screen width and height. Allows fullscreen support
+	private static int setScreenSize(String string) {
+		
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+				
+		if( string.equals("width") )   return (display_toggles[config_n][7]) ? dim.width  : screen[config_n][0];
+		if( string.equals("height") )  return (display_toggles[config_n][7]) ? dim.height : screen[config_n][1];
+		else return -1;
+	
+	}
 
 }
  

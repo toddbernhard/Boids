@@ -1,7 +1,9 @@
 package simulation;
 
 
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,58 +50,17 @@ public class Sim extends PApplet{
 		this.frame = frame;
 	}
 
-	/* Code taken from Kyle Phillips's blog www.hapticdata.com,
-	 * specifically http://labs.hapticdata.com/2011/09/fullscreen-solutions-for-processing/#
-	 * Allows us to run the Sim as an application and in fullscreen "present" mode
-	 * Many thanks to Kyle Phillips!
-	 */
-	/*public static void main(String args[])
-	{
-	    //launch in "present" mode, your class is "Sketch021210" (prefix with package if used)
-		PApplet.main(new String[] {"--fullscreen","--location=0,0", "simulation.Sim"});
-	}*/
-	
-	public static void main(final String[] args) {
-		runSketch(new String[] {"simulation.Sim"}, null);
-		//runSketch(new String[] {"--fullscreen","--location=0,0", "simulation.Sim"}, null);
-	}
-	
-	/* Code by sojamo taken from http://wiki.processing.org/w/Undecorated_frame
-	 * Allows us to make an undecorated frame, without the menu bar
-	 * Many thanks to sojamo!
-	 */
-	@Override
-	public void init() {
-		super.init();
-		  /// to make a frame not displayable, you can
-		  // use frame.removeNotify()
-		/*System.out.println(frame==null);
-		frame.removeNotify(); 
 
-
-
-		// addNotify, here i am not sure if you have
-		// to add notify again.
-		frame.addNotify();
-*/
-	}
-	
-	
 	public void setup() {
-		//frame.setUnd1ecorated(true);
+
+		if( Set.SHOW_Fullscreen ) {
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			size(screenSize.width, screenSize.height, OPENGL);
+		} else {
+			size(Set.screen_Width, Set.screen_Height, OPENGL);  // Set the screen size
+		}
+		
 		frameRate(30);
-		//fishpic.resize(20, 20);
-		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
-		
-		/* Code taken from Kyle Phillips's blog www.hapticdata.com,
-		 * specifically http://labs.hapticdata.com/2011/09/fullscreen-solutions-for-processing/#
-		 * Many thanks to Kyle Phillips!
-		 * TODO needed?
-		 */
-		/*if(frameCount == 1) {
-		     frame.setLocation(0,0);
-		}*/
-		
 		
 		
 		frameCounter = 0;
@@ -185,15 +146,13 @@ public class Sim extends PApplet{
 			// speed = [-.25max, .25max]
 			// size = see settings
 			// color = see above
-			school.add(new Fish(rand.nextFloat() * Set.SCREEN_Width, rand
-					.nextFloat() * Set.SCREEN_Height, (rand.nextFloat() - .5f)
+			school.add(new Fish(rand.nextFloat() * Set.screen_Width, rand
+					.nextFloat() * Set.screen_Height, (rand.nextFloat() - .5f)
 					* Set.FISH_MaxSpeed / 2, (rand.nextFloat() - .5f)
 					* Set.FISH_MaxSpeed / 2, Set.FISH_MinSize
 					+ rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), this,
 					color));
-			if (Set.SHOW_Groups) {
-				// school.get(i).color = Boid.colors[i%Boid.colors.length];
-			}
+
 		}
 
 		if (Set.NUMBER_Obstacles > 0) {
@@ -210,8 +169,8 @@ public class Sim extends PApplet{
 
 		if (Set.NUMBER_Sharks > 0) {
 			for (int i = 0; i < Set.NUMBER_Sharks; i++) {
-				school.add(new Shark(rand.nextFloat() * Set.SCREEN_Width, rand
-						.nextFloat() * Set.SCREEN_Height, 0, 0, this));
+				school.add(new Shark(rand.nextFloat() * Set.screen_Width, rand
+						.nextFloat() * Set.screen_Height, 0, 0, this));
 			}
 		}
 
@@ -254,15 +213,10 @@ public class Sim extends PApplet{
 			// If we have obstacles and target is turned on, draw it
 			if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
 				fill(150, 0, 0, 40);
-				rect(Set.SCREEN_Width / 2, Set.SCREEN_Height / 2,
+				rect(Set.screen_Width / 2, Set.screen_Height / 2,
 						Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize);
 			}
 			
-			/*
-			 * TODO Groups don't work
-			 * if (Set.SHOW_Groups) {
-			 * Boid.group(school); }
-			 */
 
 			for (int i = 0; i < school.size(); i++) {
 				i += school.get(i).step(school);
@@ -331,11 +285,11 @@ public class Sim extends PApplet{
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
 		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
-			for (int i = 0; i < Set.SCREEN_Width; i++) {
+			for (int i = 0; i < Set.screen_Width; i++) {
 				stroke(colors.get(Kinect.COLOR_OFFSET
 						+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
-								Set.SCREEN_Width)));
-				line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
+								Set.screen_Width)));
+				line(i, Set.screen_Height - 10, i, Set.screen_Height);
 			}
 		}
 
@@ -398,60 +352,7 @@ public class Sim extends PApplet{
 	}
 
 
-	/*
-	 * private void group( Fish[] school, ArrayList<ArrayList<Fish>> groups ) {
-	 * 
-	 * boolean placed; int i, j, k;
-	 * 
-	 * for( i=0; i<school.length; i++ ) { placed = false;
-	 * 
-	 * for( j=0; j<groups.size(); j++ ) { for( k=0; k<groups.get(j).size(); k++
-	 * ) {
-	 * 
-	 * if( !placed && PVector.sub(school[i].position,
-	 * groups.get(j).get(k).position ).mag() < 2*Fish.AWARE_RADIUS &&
-	 * PVector.sub(school[i].speed, groups.get(j).get(k).position ).mag() < 20 )
-	 * {
-	 * 
-	 * groups.get(j).add( school[i] ); placed = true; }
-	 * 
-	 * } }
-	 * 
-	 * if( !placed ) { groups.add( new ArrayList<Fish>() ); groups.get( j ).add(
-	 * school[i] ); } }
-	 * 
-	 * for( i=0; i<groups.size(); i++ ) { for( j=0; j<groups.get(i).size(); j++
-	 * ) {
-	 * 
-	 * switch( (Fish.colorCounter%21)/7 ) { case 0: groups.get(i).get(j).color =
-	 * color( (Fish.colorCounter%7)*35 + 10, 0, 0 ); break; case 1:
-	 * groups.get(i).get(j).color = color( 0, (Fish.colorCounter%7)*35 + 10, 0
-	 * ); break; case 2: groups.get(i).get(j).color = color( 0, 0,
-	 * (Fish.colorCounter%7)*35 + 10 ); break; }
-	 * 
-	 * } Fish.colorCounter++; } //System.out.println( groups.size() ); }
-	 */
-
-	/*
-	 * private void updateGroups( Fish[] school, ArrayList<ArrayList<Fish>>
-	 * groups ) {
-	 * 
-	 * boolean changed = true; int i, j;
-	 * 
-	 * while( changed ) {
-	 * 
-	 * changed = false;
-	 * 
-	 * for( i=0; i<groups.size(); i++ ) { for( j=0; j<groups.get(i).size(); j++
-	 * ) {
-	 * 
-	 * 
-	 * 
-	 * } } }
-	 * 
-	 * }
-	 */
-
+	
 	private float lawOfCos_SideC(float sideA, float angleC, float sideB) {
 		return (float) Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2) - 2
 				* sideA * sideB * ((float) Math.cos(angleC)));
@@ -516,17 +417,17 @@ public class Sim extends PApplet{
 
 		gl.glUseProgram(shaderProgram);
 		int loc = gl.glGetUniformLocation(shaderProgram, "screen");
-		gl.glUniform1f(loc, Set.SCREEN_Width / Set.SCREEN_Height);
+		gl.glUniform1f(loc, Set.screen_Width / Set.screen_Height);
 
 		loc = gl.glGetUniformLocation(shaderProgram, "time");
 		gl.glUniform1f(loc, time);
 
 		gl.glColor3f(1, 1, 1);
 		gl.glBegin(GL.GL_POLYGON);
-		gl.glVertex3f(-Set.SCREEN_Width, -Set.SCREEN_Height, -1);
-		gl.glVertex3f(Set.SCREEN_Width, -Set.SCREEN_Height, -1);
-		gl.glVertex3f(Set.SCREEN_Width, Set.SCREEN_Height, -1);
-		gl.glVertex3f(-Set.SCREEN_Width, Set.SCREEN_Height, -1);
+		gl.glVertex3f(-Set.screen_Width, -Set.screen_Height, -1);
+		gl.glVertex3f(Set.screen_Width, -Set.screen_Height, -1);
+		gl.glVertex3f(Set.screen_Width, Set.screen_Height, -1);
+		gl.glVertex3f(-Set.screen_Width, Set.screen_Height, -1);
 		gl.glEnd();
 
 		gl.glUseProgram(0);

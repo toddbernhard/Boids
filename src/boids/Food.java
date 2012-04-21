@@ -62,10 +62,10 @@ public class Food extends Boid {
 		
 		position.add( speed );
 	
-		if(position.x < 0) position.x += Set.SCREEN_Width;
-		if(position.y < 0) position.y += Set.SCREEN_Height;
-		if(position.x > Set.SCREEN_Width  ) position.x %= Set.SCREEN_Width;
-		if(position.y > Set.SCREEN_Height ) position.x %= Set.SCREEN_Height;
+		if(position.x < 0) position.x += Set.screen_Width;
+		if(position.y < 0) position.y += Set.screen_Height;
+		if(position.x > Set.screen_Width  ) position.x %= Set.screen_Width;
+		if(position.y > Set.screen_Height ) position.x %= Set.screen_Height;
 	
 		int flockSize = flock.size();
 		Boid other;
