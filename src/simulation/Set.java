@@ -18,10 +18,10 @@ public class Set {
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
 		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
-		//  2; // Old demo 1: no kinect, red fish w/ sharks in small screen
+		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
 		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
-			5; // Same as 1, no kinect, fullscreen testing
+			5; // testing for drawing the fish
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
@@ -37,10 +37,10 @@ public class Set {
 		// BasisVec, KinematicVec, AwareRadius, AwareCone, Obstacles, ObstTarget, Sprites(vsDrawn), Fullscreen	
 		{{ true, true, true, true, true, true, true,  true, true },
 		 { false, false, false, false,  true, false, false, true },
-		 { false, false, false, false,  true, false, false, false},
+		 { false, false, false, false,  true, false, false, true},
 		 { false, false, false, false,  true, false, false, true },
 		 { false, false, false, false,  true, false,  true, false },
-		 { false, false, false, false,  true, false, false, false }};
+		 { false, false, false, false,  true, false, false, true }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
@@ -97,7 +97,7 @@ public class Set {
 	public static final boolean JOGL_RenderShaders = false;
 	// this controls the speed of the water in the background
 	// bigger = faster
-	public static final float JOGL_TimeIncrement = (float)0.002;
+	public static final float JOGL_TimeIncrement = (float)0.01;
 		
 	public static final String JOGL_VertexPath = "/Users/vestibule/java_workspace/Boids/warping.vert";
 	public static final String JOGL_FragmentPath = "/Users/vestibule/java_workspace/Boids/warping_water.frag";

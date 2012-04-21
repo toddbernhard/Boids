@@ -53,6 +53,7 @@ public class Sim extends PApplet{
 
 	public void setup() {
 
+		
 		if( Set.SHOW_Fullscreen ) {
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			size(screenSize.width, screenSize.height, OPENGL);

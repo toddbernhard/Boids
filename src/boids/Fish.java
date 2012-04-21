@@ -379,7 +379,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 			
 		} else {
 			// Code to draw the fish from scratch
-			
+
 			// head are the three points that define the head
 			PVector head[] = {
 					new PVector((float) (H_WIDTH * Math.cos(getHeading()
@@ -402,6 +402,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 				head[2].mult(1.1f - .3f * fracSpeed);
 			}
 
+
 			// tail are the two points that define the tail
 			PVector tail[] = {
 					new PVector((float) (T_LENGTH * Math.cos(getHeading()
@@ -412,27 +413,18 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 										- PConstants.PI / 2 - T_ANGLE)),
 								(float) (T_LENGTH * Math.sin(getHeading()
 										- PConstants.PI / 2 - T_ANGLE))) };
-
-		/*
-		 * PVector accel = recentAccel;
-		 * 
-		 * 
-		 * if( accel != null ) { accel =
-		 * Boid.matrixMult(Boid.inverse(basis), recentAccel );
-		 * accel.normalize(); accel.mult((float)T_LENGTH/2); if( accel.x >
-		 * 0 ) { accel.x = - accel.x; } accel.y *= .5f; //if( accel.x >
-		 * -.5f*T_LENGTH ) { // accel.x = (float) (-.5*T_LENGTH); //}
-		 * } else { accel = new PVector( -1, 0 ); } accel =
-		 * Boid.matrixMult(basis, accel);
-		 * 
-		 * //PVector accel = recentAccel; PVector tail[] = { PVector.sub(
-		 * accel, head[2] ), PVector.sub( accel, head[0] ) };
-		 * 
-		 * tail[0].normalize(); tail[1].normalize(); tail[0].mult( (float)
-		 * T_LENGTH ); tail[1].mult( (float) T_LENGTH );
-		 */
-
-		
+			/*
+			PVector waist[] = {
+					new PVector((float) (-5*T_LENGTH/12 * Math.cos(getHeading()+.05)),
+								(float) (-5*T_LENGTH/12 * Math.sin(getHeading()+.05))),
+					new PVector((float) (-5*T_LENGTH/12 * Math.cos(getHeading()-.05)),
+								(float) (-5*T_LENGTH/12 * Math.sin(getHeading()-.05)) )};
+			*/
+			
+			PVector waist = 
+					new PVector((float) (-9*T_LENGTH/24 * Math.cos(getHeading())),
+								(float) (-9*T_LENGTH/24 * Math.sin(getHeading())));
+			
 			// Draw head
 			sim.fill(head_color);
 			sim.stroke(head_color);
@@ -454,19 +446,21 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 			sim.stroke(color);
 
 			// Connect the dots
-			sim.beginShape();
+			sim.beginShape(PConstants.TRIANGLES);
 			sim.vertex((int) (position.x + head[0].x),
 					(int) (position.y + head[0].y));
 			sim.vertex((int) (position.x + head[2].x),
 					(int) (position.y + head[2].y));
-			sim.vertex((int) (position.x + tail[0].x),
-					(int) (position.y + tail[0].y));
+			sim.vertex((int) (position.x + waist.x),
+					(int) (position.y + waist.y));
 			sim.vertex((int) (position.x + tail[1].x),
 					(int) (position.y + tail[1].y));
-			sim.vertex((int) (position.x + head[0].x),
-					(int) (position.y + head[0].y));
+			sim.vertex((int) (position.x + tail[0].x),
+					(int) (position.y + tail[0].y));
+			sim.vertex((int) (position.x + waist.x),
+					(int) (position.y + waist.y));
 			sim.endShape();
-
+	
 		}
 		// END DRAW FISH	
 		
