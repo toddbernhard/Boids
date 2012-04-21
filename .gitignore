@@ -2,3 +2,4 @@ $ cat .gitignore
 bin/
 .DS_Store
 src/.DS_Store
+*.orig
