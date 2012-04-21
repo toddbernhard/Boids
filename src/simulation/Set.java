@@ -32,7 +32,7 @@ public class Set {
 	//  In order, on/off: BasisVec, KinematicVec, AwareRadius, AwareCone, Groups, Obstacles, ObstTarget, Sprites(vsDrawn)
 	private static final boolean[][] display_toggles =  {{ true, true,  true,  true,  true,   true, true,  true },
 														{ false, false, false, false, false,  true, false, false },
-		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, true },
+		/* NB: Groups is very buggy */					{ false, false, false, false, false,  true, false, false },
 														{ false, false, false, false, false,  true, false, false },
 														{ false, false, false, false, false,  true, false, true  },
 														{ false, false, false, false, false,  false,false, false }};

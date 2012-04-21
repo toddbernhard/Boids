@@ -560,12 +560,22 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 					(int) (position.y + head[0].y));
 			sim.vertex((int) (position.x + head[2].x),
 					(int) (position.y + head[2].y));
-			sim.vertex((int) (position.x + tail[0].x),
-					(int) (position.y + tail[0].y));
-			sim.vertex((int) (position.x + tail[1].x),
+			sim.vertex((int) (position.x + tail[0].x - H_LENGTH/2),
+					(int) (position.y + tail[0].y - H_WIDTH/2));
+/*			sim.vertex((int) (position.x + tail[1].x),
 					(int) (position.y + tail[1].y));
 			sim.vertex((int) (position.x + head[0].x),
 					(int) (position.y + head[0].y));
+				*/
+			/*
+			 * wispy fish
+			sim.vertex((int) (position.x + head[0].x),
+					(int) (position.y + head[0].y));
+			sim.vertex((int) (position.x + head[1].x),
+					(int) (position.y + head[1].y));
+			sim.vertex((int) (position.x + tail[0].x),
+					(int) (position.y + tail[0].y));
+			*/
 			sim.endShape();
 
 		}
