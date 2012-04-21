@@ -1,6 +1,7 @@
 package simulation;
 
 
+import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,13 +43,65 @@ public class Sim extends PApplet{
 	String fragmentSource;
 	int shaderProgram;
 	float time;
+	
+	public Sim(Frame frame) {
+		this.frame = frame;
+	}
 
+	/* Code taken from Kyle Phillips's blog www.hapticdata.com,
+	 * specifically http://labs.hapticdata.com/2011/09/fullscreen-solutions-for-processing/#
+	 * Allows us to run the Sim as an application and in fullscreen "present" mode
+	 * Many thanks to Kyle Phillips!
+	 */
+	/*public static void main(String args[])
+	{
+	    //launch in "present" mode, your class is "Sketch021210" (prefix with package if used)
+		PApplet.main(new String[] {"--fullscreen","--location=0,0", "simulation.Sim"});
+	}*/
+	
+	public static void main(final String[] args) {
+		runSketch(new String[] {"simulation.Sim"}, null);
+		//runSketch(new String[] {"--fullscreen","--location=0,0", "simulation.Sim"}, null);
+	}
+	
+	/* Code by sojamo taken from http://wiki.processing.org/w/Undecorated_frame
+	 * Allows us to make an undecorated frame, without the menu bar
+	 * Many thanks to sojamo!
+	 */
 	@Override
+	public void init() {
+		super.init();
+		  /// to make a frame not displayable, you can
+		  // use frame.removeNotify()
+		/*System.out.println(frame==null);
+		frame.removeNotify(); 
+
+
+
+		// addNotify, here i am not sure if you have
+		// to add notify again.
+		frame.addNotify();
+*/
+	}
+	
+	
 	public void setup() {
+		//frame.setUnd1ecorated(true);
 		frameRate(30);
 		//fishpic.resize(20, 20);
 		size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
-				
+		
+		/* Code taken from Kyle Phillips's blog www.hapticdata.com,
+		 * specifically http://labs.hapticdata.com/2011/09/fullscreen-solutions-for-processing/#
+		 * Many thanks to Kyle Phillips!
+		 * TODO needed?
+		 */
+		/*if(frameCount == 1) {
+		     frame.setLocation(0,0);
+		}*/
+		
+		
+		
 		frameCounter = 0;
 		rand = new Random();
 		colors = new ArrayList<Integer>();
@@ -169,6 +222,7 @@ public class Sim extends PApplet{
 
 	@Override
 	public void draw() {
+		
 		// Display StdDev Adjust mode for Kinect
 		if (Set.KINECT_SetupMode
 				&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
