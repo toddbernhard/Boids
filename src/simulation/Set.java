@@ -53,8 +53,8 @@ public class Set {
 	
 	// TODO NOT FINAL. be careful that we never set these. maybe use getter/setters, but don't want the function call
 	// These two lines check Fullscreen display_toggle: if yes->null, if no->respective setting from this class
-	public static Integer screen_Width  = setScreenSize("width");
-	public static Integer screen_Height =	setScreenSize("height");
+	public static Integer SCREEN_Width  = setScreenSize("width");
+	public static Integer SCREEN_Height =	setScreenSize("height");
 	
 	public static final int SCREEN_EdgeWidth  =	screen[config_n][2];
 	public static final int SCREEN_FrameRate  =	30; // Maximum framerate
@@ -89,8 +89,8 @@ public class Set {
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{screen_Width,screen_Height}},  // Initial museum steup
-														    {{   0,  0 },{screen_Width,screen_Height}} };// Full screen
+	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{SCREEN_Width,SCREEN_Height}},  // Initial museum steup
+														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
 	public static final int[][] KINECT_Coord			= KINECT_CoordTable[1];
 
 	

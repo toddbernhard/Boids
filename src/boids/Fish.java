@@ -159,10 +159,10 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		position.add(speed);
 		
 		// Make sure the new position is onscreen; if not, wrap it
-		if( position.x < 0 ) position.x += Set.screen_Width;
-		if( position.y < 0 ) position.y += Set.screen_Height;
-		position.x %= Set.screen_Width;
-		position.y %= Set.screen_Height;
+		if( position.x < 0 ) position.x += Set.SCREEN_Width;
+		if( position.y < 0 ) position.y += Set.SCREEN_Height;
+		position.x %= Set.SCREEN_Width;
+		position.y %= Set.SCREEN_Height;
 		
 		// Update basis
 		basis[0].set(speed);

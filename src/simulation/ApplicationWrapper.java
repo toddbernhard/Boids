@@ -30,12 +30,12 @@ public class ApplicationWrapper extends Frame {
              } else {
                  System.err.println("Full screen not supported");
             	 setResizable(false); // We don't yet support live resizing. Have to restart
-                 setBounds(0, 0, Set.screen_Width, Set.screen_Height);
+                 setBounds(0, 0, Set.SCREEN_Width, Set.SCREEN_Height);
              }
          	 
          } else { // No fullscreen
         	 setResizable(false); // We don't yet support live resizing. Have to restart
-         	 setBounds(0, 0, Set.screen_Width, Set.screen_Height);
+         	 setBounds(0, 0, Set.SCREEN_Width, Set.SCREEN_Height);
          }
 
          PApplet embed = new Sim(this);

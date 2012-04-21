@@ -12,7 +12,7 @@ public class Obstacle extends Boid {
 
 	
 	private static final Boid.Type TYPE = Boid.Type.OBSTACLE;
-	private static final PVector CENTER_VECTOR = new PVector( Set.screen_Width/2, Set.screen_Height/2 );
+	private static final PVector CENTER_VECTOR = new PVector( Set.SCREEN_Width/2, Set.SCREEN_Height/2 );
 	
 	
 	public Obstacle() {
@@ -35,30 +35,30 @@ public class Obstacle extends Boid {
 		
 		position.add( speed );
 		
-		if( position.x < 0 || position.x > Set.screen_Width ||
-			position.y < 0 || position.y > Set.screen_Height   ) {
+		if( position.x < 0 || position.x > Set.SCREEN_Width ||
+			position.y < 0 || position.y > Set.SCREEN_Height   ) {
 			
-			int sourcePixel = Sim.rand.nextInt( 2*(Set.screen_Height+Set.screen_Width) );
+			int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
 			
-			if( sourcePixel < Set.screen_Width ) {
+			if( sourcePixel < Set.SCREEN_Width ) {
 			// Entering from TOP	
 				position.x = sourcePixel;
 				position.y = 0;
 				
-			} else if( sourcePixel < Set.screen_Width+Set.screen_Height ) {
+			} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
 			// Entering from RIGHT
-				position.x = Set.screen_Width;
-				position.y = sourcePixel - Set.screen_Width;
+				position.x = Set.SCREEN_Width;
+				position.y = sourcePixel - Set.SCREEN_Width;
 				
-			} else if( sourcePixel < 2*Set.screen_Width + Set.screen_Height ) {
+			} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
 			// Entering from BOTTOM
-				position.x = sourcePixel - Set.screen_Width - Set.screen_Height;
-				position.y = Set.screen_Height;
+				position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+				position.y = Set.SCREEN_Height;
 				
 			} else {
 			// Entereing from LEFT
 				position.x = 0;
-				position.y = sourcePixel - 2*Set.screen_Width - Set.screen_Height;
+				position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
 				
 			}
 			

@@ -72,15 +72,15 @@ public abstract class Boid {
 		if( position.x < Set.SCREEN_EdgeWidth ) {
 			accel.x += redoRangeERROR( 1/(float)Math.pow( 1 + position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.screen_Width - position.x < Set.SCREEN_EdgeWidth ) {
-			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.screen_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+		else if( Set.SCREEN_Width - position.x < Set.SCREEN_EdgeWidth ) {
+			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		if( position.y < Set.SCREEN_EdgeWidth ) {
 			accel.y += redoRangeERROR( 1/(float)Math.pow( 1 + position.y, 1), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.screen_Height - position.y < Set.SCREEN_EdgeWidth ) {
-			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.screen_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
+		else if( Set.SCREEN_Height - position.y < Set.SCREEN_EdgeWidth ) {
+			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
 		return accel;
@@ -101,8 +101,8 @@ public abstract class Boid {
 			if(    boid.grouped == false
 				//&& PVector.sub(boids[index].speed,    boids[i].speed ).mag() < 5
 				&& (   PVector.sub(position, boid.position ).mag() < 1.5*50
-					|| Math.abs(position.x-boid.position.x-Set.screen_Width) < 3*50
-					|| Math.abs(position.y-boid.position.y-Set.screen_Height) < 3*50 )  ) {
+					|| Math.abs(position.x-boid.position.x-Set.SCREEN_Width) < 3*50
+					|| Math.abs(position.y-boid.position.y-Set.SCREEN_Height) < 3*50 )  ) {
 				
 				boid.groupHelper( school, group);
 				

@@ -57,7 +57,7 @@ public class Sim extends PApplet{
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			size(screenSize.width, screenSize.height, OPENGL);
 		} else {
-			size(Set.screen_Width, Set.screen_Height, OPENGL);  // Set the screen size
+			size(Set.SCREEN_Width, Set.SCREEN_Height, OPENGL);  // Set the screen size
 		}
 		
 		frameRate(30);
@@ -146,8 +146,8 @@ public class Sim extends PApplet{
 			// speed = [-.25max, .25max]
 			// size = see settings
 			// color = see above
-			school.add(new Fish(rand.nextFloat() * Set.screen_Width, rand
-					.nextFloat() * Set.screen_Height, (rand.nextFloat() - .5f)
+			school.add(new Fish(rand.nextFloat() * Set.SCREEN_Width, rand
+					.nextFloat() * Set.SCREEN_Height, (rand.nextFloat() - .5f)
 					* Set.FISH_MaxSpeed / 2, (rand.nextFloat() - .5f)
 					* Set.FISH_MaxSpeed / 2, Set.FISH_MinSize
 					+ rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), this,
@@ -169,8 +169,8 @@ public class Sim extends PApplet{
 
 		if (Set.NUMBER_Sharks > 0) {
 			for (int i = 0; i < Set.NUMBER_Sharks; i++) {
-				school.add(new Shark(rand.nextFloat() * Set.screen_Width, rand
-						.nextFloat() * Set.screen_Height, 0, 0, this));
+				school.add(new Shark(rand.nextFloat() * Set.SCREEN_Width, rand
+						.nextFloat() * Set.SCREEN_Height, 0, 0, this));
 			}
 		}
 
@@ -213,7 +213,7 @@ public class Sim extends PApplet{
 			// If we have obstacles and target is turned on, draw it
 			if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
 				fill(150, 0, 0, 40);
-				rect(Set.screen_Width / 2, Set.screen_Height / 2,
+				rect(Set.SCREEN_Width / 2, Set.SCREEN_Height / 2,
 						Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize);
 			}
 			
@@ -285,11 +285,11 @@ public class Sim extends PApplet{
 		// Renders Kinect color spectrum at the bottom of screen
 		// SLOW, but OKAY
 		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
-			for (int i = 0; i < Set.screen_Width; i++) {
+			for (int i = 0; i < Set.SCREEN_Width; i++) {
 				stroke(colors.get(Kinect.COLOR_OFFSET
 						+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
-								Set.screen_Width)));
-				line(i, Set.screen_Height - 10, i, Set.screen_Height);
+								Set.SCREEN_Width)));
+				line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
 			}
 		}
 
@@ -417,17 +417,17 @@ public class Sim extends PApplet{
 
 		gl.glUseProgram(shaderProgram);
 		int loc = gl.glGetUniformLocation(shaderProgram, "screen");
-		gl.glUniform1f(loc, Set.screen_Width / Set.screen_Height);
+		gl.glUniform1f(loc, Set.SCREEN_Width / Set.SCREEN_Height);
 
 		loc = gl.glGetUniformLocation(shaderProgram, "time");
 		gl.glUniform1f(loc, time);
 
 		gl.glColor3f(1, 1, 1);
 		gl.glBegin(GL.GL_POLYGON);
-		gl.glVertex3f(-Set.screen_Width, -Set.screen_Height, -1);
-		gl.glVertex3f(Set.screen_Width, -Set.screen_Height, -1);
-		gl.glVertex3f(Set.screen_Width, Set.screen_Height, -1);
-		gl.glVertex3f(-Set.screen_Width, Set.screen_Height, -1);
+		gl.glVertex3f(-Set.SCREEN_Width, -Set.SCREEN_Height, -1);
+		gl.glVertex3f(Set.SCREEN_Width, -Set.SCREEN_Height, -1);
+		gl.glVertex3f(Set.SCREEN_Width, Set.SCREEN_Height, -1);
+		gl.glVertex3f(-Set.SCREEN_Width, Set.SCREEN_Height, -1);
 		gl.glEnd();
 
 		gl.glUseProgram(0);
