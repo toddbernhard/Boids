@@ -41,15 +41,18 @@ public class Kinect {
 	public float filterThreshold = Set.KINECT_DefaultFilter; // filters out pixels w/ a stddev > threshold;
 	public int range = -4400;
 	public int rangeSize = 4000;
-	public float pointCloudRepulsionMulti = 0.1f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
+	public float pointCloudRepulsionMulti = 0.2f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
 
 	public int[] mapKinectToSim_Col = new int[640]; // Each col of Kinect depth image corresponds to a col of Sim screen
 	public int[] mapKinectToSim_Row = new int[480]; // Each row        "         "          "          row      "
 	
 	public int[] mapDepthToColor;
 
+	public RunningStat[] stats;
+	
 	public int alphaChannel = 200;
 
+	
 	public Kinect(Sim simul, int mode) {
 		// If we'll need a config, create one
 		if (Set.KINECT_SetupMode) {
@@ -129,7 +132,66 @@ public class Kinect {
 		System.out.println("\nCalibration DONE!");
 
 	}
+	
+	public void initFancy(int i) {
+		
+		int perc10 = 0;
+		
+		// Setup
+		if( i==0 ) {
+			System.out.println("calibrating kinect...");
 
+			// Fetch data once
+			context.update();
+			depthMap = context.depthMap();
+			diffMap = new int[depthMap.length];
+			if( Set.KINECT_INIT_AffectsSim ) {
+				pointCloud = new boolean[depthMap.length];
+			}
+
+			// Get ready for the rest
+			perc10 = Set.KINECT_CalibrationLevel / 10;
+			stats = new RunningStat[depthMap.length];
+			for (int j = 0; j < depthMap.length; j++) {
+				stats[j] = new RunningStat();
+			}
+		}
+		
+		// Take the samples and process
+		if (i % perc10 == 0) {
+			System.out.printf("%d", i / perc10);
+		}
+
+		// Fetch data
+		context.update();
+		depthMap = context.depthMap();
+
+		// Add it up
+		for (int j = 0; j < depthMap.length; j++) {
+			stats[j].addSample(depthMap[j]);
+		}
+
+
+		if(i == Set.KINECT_CalibrationLevel) {
+			// If we're in config mode, save the data
+			if (config != null) {
+				config.stats = stats;
+			}
+
+			// Save the scene
+			for (int j = 0; j < depthMap.length; j++) {
+				staticScene[j] = (int) stats[j].getMean();
+			}
+			
+			refreshGoodPixels(stats);
+			stats = null; // release the stats
+			
+			System.out.println("\nCalibration DONE!");
+		}
+	
+	}
+
+	
 	public void update() {
 		// update the cam;
 		context.update();
@@ -195,7 +257,7 @@ public class Kinect {
 		}
 
 		for (int i = 0; i < 640; i++) {
-			mapKinectToSim_Col[639-i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][0],
+			mapKinectToSim_Col[i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][0],
 					Set.KINECT_Coord[1][0], 0, 640);
 		}
 

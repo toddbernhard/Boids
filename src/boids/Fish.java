@@ -282,7 +282,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 				if( kinect.pointCloud[kinect.goodPixels[i]] ) {
 					displaceVector.x = position.x - kinect.mapKinectToSim_Col[kinect.goodPixels[i]%640];
 					displaceVector.y = position.y - kinect.mapKinectToSim_Row[kinect.goodPixels[i]/640];
-					if( displaceVector.mag() < AWARE_RADIUS ) {
+					if( displaceVector.mag() < AWARE_RADIUS*1.5f ) {
 						displaceVector.mult(kinect.pointCloudRepulsionMulti);
 						avoidance.add( displaceVector );
 					}

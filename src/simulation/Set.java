@@ -17,15 +17,15 @@ public class Set {
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
-		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+			1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
 		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
-			5; // testing for drawing the fish
+		//	5; // testing for drawing the fish
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
-										   {  800,    600,     0, 		2 },
+										   {  800,    600,     50, 		2 },
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
 										   {  800,    600,    50,		0 },
@@ -44,7 +44,7 @@ public class Set {
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
-												{ 350,    150,     50,        50,         0,      0,     0    },
+												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    },
 												{ 40,      40,     40,        40,         0,      0,     4    },
@@ -53,11 +53,12 @@ public class Set {
 	
 	// TODO NOT FINAL. be careful that we never set these. maybe use getter/setters, but don't want the function call
 	// These two lines check Fullscreen display_toggle: if yes->null, if no->respective setting from this class
-	public static Integer SCREEN_Width  = setScreenSize("width");
-	public static Integer SCREEN_Height =	setScreenSize("height");
+	public static int SCREEN_Width  = setScreenSize("width");
+	public static int SCREEN_Height = setScreenSize("height");
 	
-	public static final int SCREEN_EdgeWidth  =	screen[config_n][2];
-	public static final int SCREEN_FrameRate  =	30; // Maximum framerate
+	public static final int SCREEN_EdgeWidth  			= screen[config_n][2];
+	public static final int SCREEN_FrameRate  			= 30; // Maximum framerate
+	public static final int[] SCREEM_BackgroundColor 	= { 0, 50, 150 };
 
 	
 	//public static final int 	KINECT_ConfigNumber 	= 2; // override
@@ -72,7 +73,7 @@ public class Set {
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
 												{  4 },
-												{ 12 },
+												{ 15 },
 												{ 5  }};
 	
 	public static final boolean KINECT_On 				= KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
@@ -81,17 +82,17 @@ public class Set {
 	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
 	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
-	public static final int 	KINECT_CalibrationLevel = 500;	// Calibration sample size
+	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
 	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
-	public static final boolean KINECT_FancyStart		= false; // BROKEN
+	public static final boolean KINECT_FancyStart		= true; // BROKEN
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-175,-500},{SCREEN_Width,SCREEN_Height}},  // Initial museum steup
+	public static final int[][][] KINECT_CoordTable 	= { {{-180,-450},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
 														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
-	public static final int[][] KINECT_Coord			= KINECT_CoordTable[1];
+	public static final int[][] KINECT_Coord			= KINECT_CoordTable[0];
 
 	
 	public static final boolean JOGL_RenderShaders = false;
@@ -167,10 +168,10 @@ public class Set {
 
 
 											  // Body RGB   Head RGB
-	public static final int[][] FISH_Styles = {{ 180,10,0,  180,120,0 },  // Red
+	public static final int[][] FISH_Styles = {{ 255,15,0,  255,160,0 },  // Red
 		   									   { 100,100,255,  255,200,0 },	  // Blue
-											   { 50,150,10, 50,100,200 }, // Green
-								   			   { 200,170,0,    0,0,255 }};	  // Yellow
+											   { 100,200,20, 80,150,255 }, // Green
+								   			   { 255,210,0,    0,0,255 }};	  // Yellow
 	public static final boolean FISH_StylesMingle = true;
  	
 	

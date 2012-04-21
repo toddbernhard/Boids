@@ -32,14 +32,15 @@ public class Sim extends PApplet{
 	public static Random rand; // for spawning
 	public static ArrayList<Integer> colors; // A simulation-wide color palette.
 											 // Boids register their colors on spawn.
-	
+	public static int[] mapFancyInit;
 	// TODO make this more dynamic, put in settings too
 	public Sprite fishSprite;
 	
 	public ArrayList<Boid> school;
 
 	public static Kinect kinect; // kinect handle
-
+	public static int backgroundColor;
+	
 	// OpenGL shader stuff
 	String vertexSource;
 	String fragmentSource;
@@ -62,10 +63,12 @@ public class Sim extends PApplet{
 		}
 		
 		frameRate(30);
-		
-		
 		frameCounter = 0;
 		rand = new Random();
+		
+		backgroundColor = color(Set.SCREEM_BackgroundColor[0],
+								Set.SCREEM_BackgroundColor[1],
+								Set.SCREEM_BackgroundColor[2]);
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 
@@ -77,10 +80,6 @@ public class Sim extends PApplet{
 			fishSprite.setScale(scale);
 		}
 		
-		if (Set.KINECT_On) {
-			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
-			kinect.init();
-		}
 
 		if(Set.JOGL_RenderShaders) {
 			try {
@@ -178,10 +177,39 @@ public class Sim extends PApplet{
 		stroke(155, 0, 0);
 		rectMode(CENTER);
 		frameRate(30);
+		
+			
+		if (Set.KINECT_On) {
+			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
+//			if( Set.KINECT_FancyStart == false ) {
+				kinect.init();
+//			} else {*/
+//				
+//				for(int i=0; i<=Set.KINECT_CalibrationLevel; i++) {
+//					kinect.initFancy(i);
+//					drawInitFancy(i);
+//				}
+
+		//	}
+/*			if(Set.KINECT_FancyStart) {
+				mapFancyInit = new int[Set.KINECT_CalibrationLevel+1];
+				for(int i=0; i<Set.KINECT_CalibrationLevel; i++) {
+					mapFancyInit[i] = (int)Boid.redoRange(i, Set.SCREEN_Width/2, 1, 0, Set.KINECT_CalibrationLevel );
+				}*/
+			//}
+		}
 	}
+
 
 	@Override
 	public void draw() {
+		
+		/*
+		if(frameCount<=Set.KINECT_CalibrationLevel) {
+			drawFancyInit(frameCount);
+			//System.out.println(frameCount);
+		} else
+		*/
 		
 		// Display StdDev Adjust mode for Kinect
 		if (Set.KINECT_SetupMode
@@ -209,7 +237,7 @@ public class Sim extends PApplet{
 				kinect.update();
 			}
 
-			background(0, 20, 80); // Clear screen
+			background(backgroundColor); // Clear screen
 
 			// If we have obstacles and target is turned on, draw it
 			if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
@@ -234,14 +262,14 @@ public class Sim extends PApplet{
 
 					color_index = (int) Boid.redoRange(
 							kinect.diffMap[kinect.goodPixels[i]], 0,
-							Kinect.NUM_COLORS, kinect.range, kinect.range
+							Kinect.NUM_COLORS-1, kinect.range, kinect.range
 									+ kinect.rangeSize);
 
 					if( kinect.config.showBackground ) {
 						if (kinect.diffMap[kinect.goodPixels[i]] < kinect.range ) {
 							color_index = 0;
 						} else if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize) {
-							color_index = Kinect.NUM_COLORS;
+							color_index = Kinect.NUM_COLORS-1;
 						}
 					} else if( kinect.diffMap[kinect.goodPixels[i]] < kinect.range ||
 							   kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize ) {
@@ -294,6 +322,23 @@ public class Sim extends PApplet{
 			}
 		}
 
+	}
+	
+	private void drawFancyInit(int i) {
+		
+		background(0);
+		
+		int space = mapFancyInit[i];
+
+		stroke(255);
+		while(space<Set.SCREEN_Height/2) {
+			line(0, Set.SCREEN_Height/2 - space, Set.SCREEN_Width, Set.SCREEN_Height/2 - space);
+			line(0, Set.SCREEN_Height/2 + space, Set.SCREEN_Width, Set.SCREEN_Height/2 + space);
+			line(Set.SCREEN_Width/2 - space, 0, Set.SCREEN_Width/2 + space, Set.SCREEN_Height);
+			line(Set.SCREEN_Width/2 - space, 0, Set.SCREEN_Width/2 + space, Set.SCREEN_Height);
+			space += mapFancyInit[i];
+		}
+		
 	}
 
 	/*
