@@ -38,7 +38,6 @@ public class Sim extends PApplet{
 	public ArrayList<Boid> school;
 
 	public static Kinect kinect; // kinect handle
-	public static Menu menu; // pause menu handle
 	public static Sprite fishSprite;
 	public static int backgroundColor;
 	
@@ -289,20 +288,7 @@ public class Sim extends PApplet{
 			}
 			
 		} else { // paused
-			if( menu == null ) {
-				menu = new Menu(this);
-			}
-			
-			background(backgroundColor);
-			
-			for (int i = 0; i < school.size(); i++) {
-				// don't step the school, but draw it
-				school.get(i).drawBoid(this);
-			}
-			
-			menu.drawSelf();
-
-			
+						
 			// Display StdDev Adjust mode for Kinect
 			if (Set.KINECT_SetupMode
 					&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {

@@ -76,7 +76,7 @@ public class Set {
 												{ 15 },
 												{ 5  }};
 	
-	public static final boolean KINECT_On 				= false;// KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
+	public static final boolean KINECT_On 				= KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
 	public static final boolean KINECT_SetupMode		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][1]; // Let's you play with the parameters
 	
 	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
