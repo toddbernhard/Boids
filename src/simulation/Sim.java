@@ -34,12 +34,14 @@ public class Sim extends PApplet{
 											 // Boids register their colors on spawn.
 	public static int[] mapFancyInit;
 	// TODO make this more dynamic, put in settings too
-	public Sprite fishSprite;
 	
 	public ArrayList<Boid> school;
 
 	public static Kinect kinect; // kinect handle
+	public static Menu menu; // pause menu handle
+	public static Sprite fishSprite;
 	public static int backgroundColor;
+	
 	
 	// OpenGL shader stuff
 	String vertexSource;
@@ -175,7 +177,8 @@ public class Sim extends PApplet{
 		}
 
 		stroke(155, 0, 0);
-		rectMode(CENTER);
+		rectMode(CORNERS);
+		// ellipseMode(CORNERS); TODO REUSE when we have better sharks
 		frameRate(30);
 		
 			
@@ -211,23 +214,6 @@ public class Sim extends PApplet{
 		} else
 		*/
 		
-		// Display StdDev Adjust mode for Kinect
-		if (Set.KINECT_SetupMode
-				&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
-			background(10, 40, 100); // Clear screen
-
-			for (int i = 0; i < kinect.depthMap.length; i++) {
-				if (kinect.config.stats[i].getStdDev() > kinect.filterThreshold) {
-					
-					if( kinect.filter ) stroke(80,50,50);
-					else stroke(255);
-					
-					point(kinect.mapKinectToSim_Col[i % 640],
-							kinect.mapKinectToSim_Row[i / 640]);
-				}
-			}
-		} else
-
 		// Display the simulation
 		if (Set.paused == false) {
 			frameCounter++;
@@ -250,7 +236,6 @@ public class Sim extends PApplet{
 			for (int i = 0; i < school.size(); i++) {
 				i += school.get(i).step(school);
 				school.get(i).drawBoid(this);
-				//drawBoid(school.get(i));
 			}
 
 			// Render the kinect if we should 
@@ -301,25 +286,59 @@ public class Sim extends PApplet{
 								kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
 					}
 				}
-		}
+			}
+			
+		} else { // paused
+			if( menu == null ) {
+				menu = new Menu(this);
+			}
+			
+			background(backgroundColor);
+			
+			for (int i = 0; i < school.size(); i++) {
+				// don't step the school, but draw it
+				school.get(i).drawBoid(this);
+			}
+			
+			menu.drawSelf();
 
+			
+			// Display StdDev Adjust mode for Kinect
+			if (Set.KINECT_SetupMode
+					&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
+				background(10, 40, 100); // Clear screen
+
+				for (int i = 0; i < kinect.depthMap.length; i++) {
+					if (kinect.config.stats[i].getStdDev() > kinect.filterThreshold) {
+						
+						if( kinect.filter ) stroke(80,50,50);
+						else stroke(255);
+						
+						point(kinect.mapKinectToSim_Col[i % 640],
+								kinect.mapKinectToSim_Row[i / 640]);
+					}
+				}
+			} else {
+
+	
+				// Renders Kinect color spectrum at the bottom of screen
+				// SLOW, but OKAY
+				if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust) {
+					for (int i = 0; i < Set.SCREEN_Width; i++) {
+						stroke(colors.get(Kinect.COLOR_OFFSET
+								+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
+										Set.SCREEN_Width)));
+						line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
+					}
+				}
+			}
+		}
+		
+		// paused or not
 		
 		// SLOW, TODO maybe cache a loop
 		if (Set.JOGL_RenderShaders) {
 			renderShaders();
-		}
-
-		frameCounter++;
-
-		// Renders Kinect color spectrum at the bottom of screen
-		// SLOW, but OKAY
-		if( Set.KINECT_SetupMode && kinect.config.mode == KinectConfig.MODE_RangeAdjust)
-			for (int i = 0; i < Set.SCREEN_Width; i++) {
-				stroke(colors.get(Kinect.COLOR_OFFSET
-						+ (int) Boid.redoRange(i, 0, Kinect.NUM_COLORS, 0,
-								Set.SCREEN_Width)));
-				line(i, Set.SCREEN_Height - 10, i, Set.SCREEN_Height);
-			}
 		}
 
 	}
