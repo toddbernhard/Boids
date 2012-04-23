@@ -25,7 +25,7 @@ public class Set {
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
-										   {  800,    600,     50, 		2 },
+										   {  800,    600,     0, 		2 },
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
 										   {  800,    600,    50,		0 },
@@ -67,7 +67,7 @@ public class Set {
 							// Format =     [ On, SetupMode, Render, AffectsSim ]
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
 													 { true,  true,  true,  true  },	// Everything On
-											   		 { true,  false, false, true  },
+											   		 { true,  true, false, true  },
 											   		 { true,  true,  false, true }};	// Hidden w/ no setup, sparse sampling
 	
 							// Format =		[ SampleInterval ]
@@ -90,7 +90,7 @@ public class Set {
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-180,-450},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
+	public static final int[][][] KINECT_CoordTable 	= { {{-200,-480},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
 														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
 	public static final int[][] KINECT_Coord			= KINECT_CoordTable[0];
 
