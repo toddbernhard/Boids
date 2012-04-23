@@ -2,14 +2,11 @@ package kinect;
 
 import java.util.ArrayList;
 
-import com.sun.tools.example.debug.bdi.SpecErrorEvent;
-
-import processing.core.PApplet;
-import quicktime.app.spaces.Space;
 import simulation.Boid;
 import simulation.Set;
 import simulation.Sim;
 import SimpleOpenNI.SimpleOpenNI;
+
 
 public class Kinect {
 
@@ -223,12 +220,14 @@ public class Kinect {
 			// If we are sampling every pixel, count it. OR if the row%interval and col%inteval ==0, count it
 			if( Set.KINECT_SampleInterval == 1 ||
 				((i/640)%Set.KINECT_SampleInterval == 0 && (i%640)%Set.KINECT_SampleInterval == 0) ) {
-				
-				if( !filter || stats[i].getStdDev() <= filterThreshold ) {
-						
-					stack.add(i);
-				
-				}
+			// if we're filtering, filter
+			if( !filter || stats[i].getStdDev() <= filterThreshold ) {
+			// always take out offscreen pixels
+			if( mapKinectToSim_Col[i] < 0 || mapKinectToSim_Col[i] > Set.SCREEN_Width ||
+				mapKinectToSim_Row[i] < 0 || mapKinectToSim_Row[i] > Set.SCREEN_Height ) {
+				stack.add(i);
+			}
+			}
 			}
 		}
 
