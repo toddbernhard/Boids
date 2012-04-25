@@ -260,7 +260,7 @@ public class Kinect {
 					Set.KINECT_Coord[1][0], 0, 640);
 		}
 
-		for (int i = 0; i < 480; i++) {
+		for (int i = 0; i < 640*480; i++) {
 			mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
 					Set.KINECT_Coord[1][1], 0, 480);
 		}
