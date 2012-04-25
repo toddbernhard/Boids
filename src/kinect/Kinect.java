@@ -40,8 +40,8 @@ public class Kinect {
 	public int rangeSize = 4000;
 	public float pointCloudRepulsionMulti = 0.2f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
 
-	public int[] mapKinectToSim_Col = new int[640]; // Each col of Kinect depth image corresponds to a col of Sim screen
-	public int[] mapKinectToSim_Row = new int[480]; // Each row        "         "          "          row      "
+	public int[] mapKinectToSim_Col = new int[640*480]; // Each PIXEL of Kinect depth image corresponds to a col of Sim screen
+	public int[] mapKinectToSim_Row = new int[640*480]; // Each PIXEL        "         "          "          row      "
 	
 	public int[] mapDepthToColor;
 
@@ -223,8 +223,8 @@ public class Kinect {
 			// if we're filtering, filter
 			if( !filter || stats[i].getStdDev() <= filterThreshold ) {
 			// always take out offscreen pixels
-			if( mapKinectToSim_Col[i] < 0 || mapKinectToSim_Col[i] > Set.SCREEN_Width ||
-				mapKinectToSim_Row[i] < 0 || mapKinectToSim_Row[i] > Set.SCREEN_Height ) {
+			if( mapKinectToSim_Col[i] >= 0 && mapKinectToSim_Col[i] <= Set.SCREEN_Width &&
+				mapKinectToSim_Row[i] >= 0 && mapKinectToSim_Row[i] <= Set.SCREEN_Height ) {
 				stack.add(i);
 			}
 			}
@@ -255,13 +255,13 @@ public class Kinect {
 					Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1]);
 		}
 
-		for (int i = 0; i < 640; i++) {
-			mapKinectToSim_Col[i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][0],
+		for (int i = 0; i < 640*480; i++) {
+			mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
 					Set.KINECT_Coord[1][0], 0, 640);
 		}
 
 		for (int i = 0; i < 480; i++) {
-			mapKinectToSim_Row[i] = (int) Boid.redoRange(i, Set.KINECT_Coord[0][1],
+			mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
 					Set.KINECT_Coord[1][1], 0, 480);
 		}
 	}

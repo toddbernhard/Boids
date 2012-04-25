@@ -17,9 +17,9 @@ public class Set {
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
-			1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
-		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
+			3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
 		//	5; // testing for drawing the fish
 			
@@ -46,7 +46,7 @@ public class Set {
 	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
 												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
-												{ 350,    150,     50,        50,         0,      0,     0    },
+												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 40,      40,     40,        40,         0,      0,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    }};
 	
@@ -67,8 +67,8 @@ public class Set {
 							// Format =     [ On, SetupMode, Render, AffectsSim ]
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
 													 { true,  true,  true,  true  },	// Everything On
-											   		 { true,  false, false, true  },
-											   		 { true,  true,  false, true }};	// Hidden w/ no setup, sparse sampling
+											   		 { true,  false, false, true  },	// RELEASE: Hidden w/ no setup, sparse sampling
+											   		 { true,  true,  true, true }};	// setup mode, dense sampling
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
