@@ -261,8 +261,8 @@ public class Sim extends PApplet{
 					}
 					stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
 
-					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i] % 640],
-							kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
+					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
+							kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
 				}
 			} else if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
 
@@ -281,8 +281,8 @@ public class Sim extends PApplet{
 
 						stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
 
-						point(kinect.mapKinectToSim_Col[kinect.goodPixels[i] % 640],
-								kinect.mapKinectToSim_Row[kinect.goodPixels[i] / 640]);
+						point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
+								kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
 					}
 				}
 			}

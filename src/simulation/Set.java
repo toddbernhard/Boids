@@ -17,15 +17,15 @@ public class Set {
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
-			1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
-		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
+			3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
 		//	5; // testing for drawing the fish
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
-										   {  800,    600,     0, 		2 },
+										   {  800,    600,     50, 		2 },
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
 										   {  800,    600,    50,		0 },
@@ -46,7 +46,7 @@ public class Set {
 	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
 												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 400,      0,      0,         0,         0,      0,     4    },
-												{ 350,    150,     50,        50,         0,      0,     0    },
+												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 40,      40,     40,        40,         0,      0,     4    },
 												{ 350,    150,     50,        50,         0,      0,     0    }};
 	
@@ -67,8 +67,8 @@ public class Set {
 							// Format =     [ On, SetupMode, Render, AffectsSim ]
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
 													 { true,  true,  true,  true  },	// Everything On
-											   		 { true,  true, false, true  },
-											   		 { true,  true,  false, true }};	// Hidden w/ no setup, sparse sampling
+											   		 { true,  false, false, true  },	// RELEASE: Hidden w/ no setup, sparse sampling
+											   		 { true,  true,  true, true }};	// setup mode, dense sampling
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
@@ -90,7 +90,7 @@ public class Set {
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-200,-480},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
+	public static final int[][][] KINECT_CoordTable 	= { {{-180,-450},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
 														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
 	public static final int[][] KINECT_Coord			= KINECT_CoordTable[0];
 
