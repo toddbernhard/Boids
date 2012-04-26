@@ -24,7 +24,7 @@ public class KinectConfig {
 	
 	public void reset() {
 		mode = 0;
-		kinect.filter = false;
+		kinect.filter = true;
 		showBackground = false;
 	}
 

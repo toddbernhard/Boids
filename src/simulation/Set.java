@@ -48,7 +48,7 @@ public class Set {
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 40,      40,     40,        40,         0,      0,     4    },
-												{ 10,    10,     10,        5,         0,      0,     0    }};
+												{ 100,    10,     10,        5,         0,      0,     0    }};
 	
 	
 	// TODO NOT FINAL. be careful that we never set these. maybe use getter/setters, but don't want the function call
