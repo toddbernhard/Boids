@@ -40,12 +40,12 @@ public class Kinect {
 	public int rangeSize = 4000;
 	public float pointCloudRepulsionMulti = 0.2f;//900*(Set.KINECT_SampleInterval*Set.KINECT_SampleInterval)/(640*480);
 
-	public int[] mapKinectToSim_Col = new int[640*480]; // Each PIXEL of Kinect depth image corresponds to a col of Sim screen
-	public int[] mapKinectToSim_Row = new int[640*480]; // Each PIXEL        "         "          "          row      "
+	public short[] mapKinectToSim_Col = new short[640*480]; // Each PIXEL of Kinect depth image corresponds to a col of Sim screen
+	public short[] mapKinectToSim_Row = new short[640*480]; // Each PIXEL        "         "          "          row      "
 	
 	public int[] mapDepthToColor;
 
-	public RunningStat[] stats;
+	public float[] stdDevs;
 	
 	public int alphaChannel = 255;
 
@@ -57,8 +57,9 @@ public class Kinect {
 		}
 
 		// If we have to render, register our colors
-		if (Set.KINECT_INIT_Render || Set.KINECT_SetupMode ) {
-			NUM_COLORS = (SPECTRUM.length - 1) * 256 + 1;
+		if (Set.KINECT_Renderable || Set.KINECT_SetupMode ) {
+			NUM_COLORS = (SPECTRUM.length - 1) * 256;
+			System.out.println("NUM_COLORS="+NUM_COLORS);
 			COLOR_OFFSET = simul.registerColors(createColors());
 			mapDepthToColor = createDepthToColorMap();
 		}
@@ -76,6 +77,7 @@ public class Kinect {
 
 		// initialize the static scene
 		staticScene = new int[context.depthMap().length];
+		stdDevs = new float[context.depthMap().length];
 	}
 
 	public void init() {
@@ -91,14 +93,14 @@ public class Kinect {
 		}
 
 		// Get ready for the rest
-		int perc10 = Set.KINECT_CalibrationLevel / 10;
+		int perc10 = Set.kinect_CalibrationLevel / 10;
 		RunningStat[] stats = new RunningStat[depthMap.length];
 		for (int j = 0; j < depthMap.length; j++) {
 			stats[j] = new RunningStat();
 		}
 
 		// Take the samples and process
-		for (int i = 0; i < Set.KINECT_CalibrationLevel; i++) {
+		for (int i = 0; i < Set.kinect_CalibrationLevel; i++) {
 			if (i % perc10 == 0) {
 				System.out.printf("%d", i / perc10);
 			}
@@ -114,80 +116,17 @@ public class Kinect {
 
 		}
 
-		// If we're in config mode, save the data
-		if (config != null) {
-			config.stats = stats;
-		}
-
 		// Save the scene
 		for (int j = 0; j < depthMap.length; j++) {
 			staticScene[j] = (int) stats[j].getMean();
+			stdDevs[j] = (float) stats[j].getStdDev();
 		}
 
-		refreshGoodPixels(stats);
+		refreshGoodPixels();
 
 		System.out.println("\nCalibration DONE!");
 
 	}
-	
-	public void initFancy(int i) {
-		
-		int perc10 = 0;
-		
-		// Setup
-		if( i==0 ) {
-			System.out.println("calibrating kinect...");
-
-			// Fetch data once
-			context.update();
-			depthMap = context.depthMap();
-			diffMap = new int[depthMap.length];
-			if( Set.KINECT_INIT_AffectsSim ) {
-				pointCloud = new boolean[depthMap.length];
-			}
-
-			// Get ready for the rest
-			perc10 = Set.KINECT_CalibrationLevel / 10;
-			stats = new RunningStat[depthMap.length];
-			for (int j = 0; j < depthMap.length; j++) {
-				stats[j] = new RunningStat();
-			}
-		}
-		
-		// Take the samples and process
-		if (i % perc10 == 0) {
-			System.out.printf("%d", i / perc10);
-		}
-
-		// Fetch data
-		context.update();
-		depthMap = context.depthMap();
-
-		// Add it up
-		for (int j = 0; j < depthMap.length; j++) {
-			stats[j].addSample(depthMap[j]);
-		}
-
-
-		if(i == Set.KINECT_CalibrationLevel) {
-			// If we're in config mode, save the data
-			if (config != null) {
-				config.stats = stats;
-			}
-
-			// Save the scene
-			for (int j = 0; j < depthMap.length; j++) {
-				staticScene[j] = (int) stats[j].getMean();
-			}
-			
-			refreshGoodPixels(stats);
-			stats = null; // release the stats
-			
-			System.out.println("\nCalibration DONE!");
-		}
-	
-	}
-
 	
 	public void update() {
 		// update the cam;
@@ -210,7 +149,7 @@ public class Kinect {
 
 	}
 
-	protected void refreshGoodPixels(RunningStat[] stats) {
+	public void refreshGoodPixels() {
 		// protected so KinectConfig can call
 
 		ArrayList<Integer> stack = new ArrayList<Integer>();
@@ -218,10 +157,10 @@ public class Kinect {
 		for( int i=0; i<depthMap.length; i++ ) {
 			
 			// If we are sampling every pixel, count it. OR if the row%interval and col%inteval ==0, count it
-			if( Set.KINECT_SampleInterval == 1 ||
-				((i/640)%Set.KINECT_SampleInterval == 0 && (i%640)%Set.KINECT_SampleInterval == 0) ) {
+			if( Set.kinect_SampleInterval == 1 ||
+				((i/640)%Set.kinect_SampleInterval == 0 && (i%640)%Set.kinect_SampleInterval == 0) ) {
 			// if we're filtering, filter
-			if( !filter || stats[i].getStdDev() <= filterThreshold ) {
+			if( !filter || stdDevs[i] <= filterThreshold ) {
 			// always take out offscreen pixels
 			if( mapKinectToSim_Col[i] >= 0 && mapKinectToSim_Col[i] <= Set.SCREEN_Width &&
 				mapKinectToSim_Row[i] >= 0 && mapKinectToSim_Row[i] <= Set.SCREEN_Height ) {
@@ -245,49 +184,49 @@ public class Kinect {
 	 * pixels and populates mapToSimR (with the row indices) and mapToSimC (with
 	 * the column indices)
 	 */
-	private void createKinectToSimMap() {
+	public void createKinectToSimMap() {
 
-		if (Set.KINECT_Coord[1][0] - Set.KINECT_Coord[0][0] < 640
-				|| Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1] < 480) {
+		if (Set.kinect_Coord[1][0] - Set.kinect_Coord[0][0] < 640
+				|| Set.kinect_Coord[1][1] - Set.kinect_Coord[0][1] < 480) {
 			System.out.printf("warning: unsupported size. compressing depth image to %dx%d"
 					+ " (orig. 640x480)",
-					Set.KINECT_Coord[1][0] - Set.KINECT_Coord[0][0],
-					Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1]);
+					Set.kinect_Coord[1][0] - Set.kinect_Coord[0][0],
+					Set.kinect_Coord[1][1] - Set.kinect_Coord[0][1]);
 		}
 
 		for (int i = 0; i < 640*480; i++) {		
-			// If we are supposed to flip horizontally, map from KINECT_Coord(inates) to [640,0] instead of [0,640]
-			if( Set.KINECT_MirrorHoriz) {
-				mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
-						Set.KINECT_Coord[1][0], 640, 0);
+			// If we are supposed to flip horizontally, map from kinect_Coord(inates) to [640,0] instead of [0,640]
+			if( Set.kinect_MirrorHoriz) {
+				mapKinectToSim_Col[i] = (short) Boid.redoRange(i%640, Set.kinect_Coord[0][0],
+						Set.kinect_Coord[1][0], 640, 0);
 			// If not, map to [0,640]
 			} else {
-				mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
-						Set.KINECT_Coord[1][0], 0, 640);
+				mapKinectToSim_Col[i] = (short) Boid.redoRange(i%640, Set.kinect_Coord[0][0],
+						Set.kinect_Coord[1][0], 0, 640);
 			}
 		}
 
 		for (int i = 0; i < 640*480; i++) {
 			// If we are supposed to flip vertically, map from KINECT_Coord(inates) to [480,0] instead of [0,480]
-			if( Set.KINECT_MirrorVert) {
-				mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
-				Set.KINECT_Coord[1][1], 480, 0);
+			if( Set.kinect_MirrorVert) {
+				mapKinectToSim_Row[i] = (short) Boid.redoRange(i/640, Set.kinect_Coord[0][1],
+				Set.kinect_Coord[1][1], 480, 0);
 			// If not, map to [0,640]
 			} else {
-				mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
-				Set.KINECT_Coord[1][1], 0, 480);
+				mapKinectToSim_Row[i] = (short) Boid.redoRange(i/640, Set.kinect_Coord[0][1],
+				Set.kinect_Coord[1][1], 0, 480);
 			}
 		}
 
 	}
 	
 	
-	private int[] createDepthToColorMap() {
+	public int[] createDepthToColorMap() {
 		
-		int[] map = new int[DEPTH_MAX-DEPTH_MIN+1];
+		int[] map = new int[DEPTH_MAX-DEPTH_MIN];
 		
-		for( int i=DEPTH_MIN; i<=DEPTH_MAX; i++) {
-			map[i] = (int) Boid.redoRange( i, 0, NUM_COLORS, DEPTH_MIN, DEPTH_MAX+2 );
+		for( int i=DEPTH_MIN; i<DEPTH_MAX; i++) {
+			map[i] = (int) Boid.redoRange( i, 0, NUM_COLORS-1, DEPTH_MIN, DEPTH_MAX );
 		}
 		
 		return map;
@@ -313,6 +252,8 @@ public class Kinect {
 				k++;
 			}
 		}
+		//TODO
+		System.out.println("colors.length="+colors.length+","+colors[i].length);
 		return colors;
 	}
 }

@@ -12,7 +12,6 @@ public class KinectConfig {
 	
 	public int mode;
 	public boolean showBackground;
-	public RunningStat[] stats;
 	
 	private Kinect kinect;
 	
@@ -28,7 +27,7 @@ public class KinectConfig {
 		showBackground = false;
 	}
 
-	public void keyPressed(int key, int keyCode) {
+	public void keyPressed(char key, int keyCode) {
 		
 		if(keyCode == PConstants.UP) {
 			
@@ -85,7 +84,7 @@ public class KinectConfig {
 			case '4':
 				kinect.filter = !kinect.filter;
 				System.out.println( kinect.filter ? "Filter=ON" : "Filter=OFF" );
-				kinect.refreshGoodPixels(stats);
+				kinect.refreshGoodPixels();
 				break;
 			case '6':
 			case 't':

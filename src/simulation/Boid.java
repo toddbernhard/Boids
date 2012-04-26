@@ -69,17 +69,17 @@ public abstract class Boid {
 	
 	protected PVector avoidEgdes( PVector accel ) {
 		
-		if( position.x < Set.SCREEN_EdgeWidth ) {
+		if( position.x < Set.screen_EdgeWidth ) {
 			accel.x += redoRangeERROR( 1/(float)Math.pow( 1 + position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.SCREEN_Width - position.x < Set.SCREEN_EdgeWidth ) {
+		else if( Set.SCREEN_Width - position.x < Set.screen_EdgeWidth ) {
 			accel.x -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Width-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		
-		if( position.y < Set.SCREEN_EdgeWidth ) {
+		if( position.y < Set.screen_EdgeWidth ) {
 			accel.y += redoRangeERROR( 1/(float)Math.pow( 1 + position.y, 1), 0, 1.5f*getMAX_ACCEL() ); 
 		}
-		else if( Set.SCREEN_Height - position.y < Set.SCREEN_EdgeWidth ) {
+		else if( Set.SCREEN_Height - position.y < Set.screen_EdgeWidth ) {
 			accel.y -= redoRangeERROR( 1/(float)Math.pow( 1 + Set.SCREEN_Height-position.x, 3), 0, 1.5f*getMAX_ACCEL() ); 
 		}
 		

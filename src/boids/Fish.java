@@ -327,7 +327,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 	public void drawBoid(Sim sim) {
 		//============DISPLAY EXTRAS============
 		// We draw the awareness circle first so it is under the fish
-		if (Set.SHOW_Awareness) {
+		if (Set.show_Awareness) {
 			sim.stroke(255, 0, 0);
 			sim.fill(255, 0, 0, 25);
 			sim.ellipse(position.x, position.y,

@@ -34,13 +34,13 @@ public class Set {
 	
 	private static final boolean[][] display_toggles =  
 		//  In order, on/off:
-		// BasisVec, KinematicVec, AwareRadius, AwareCone, Obstacles, ObstTarget, Sprites(vsDrawn), Fullscreen	
-		{{ true, true, true, true, true, true, true,  true, true },
-		 { false, false, false, false,  true, false, false, true },
-		 { false, false, false, false,  true, false, false, true},
-		 { false, false, false, false,  true, false, false, true },
-		 { false, false, false, false,  true, false,  true, false },
-		 { false, false, false, false,  true, false, false, true }};
+		// AwareRadius, Obstacles, Sprites(vsDrawn), Fullscreen	
+		{{ true, true, true, true },
+		 { false,  true, false, true },
+		 { false,  true, false, true },
+		 { false,  true, false, true },
+		 { false,  true,  true, false },
+		 { false,  true, false, true }};
 	
 				    				// Format =  RedF #, BlueF #, GreenF #, YellowF #, Obst #, Peop # Shark # ]
 	private static final int[][] populations = {{  20,     20,     20,        20,         2,      2,     4    },
@@ -56,7 +56,6 @@ public class Set {
 	public static int SCREEN_Width  = setScreenSize("width");
 	public static int SCREEN_Height = setScreenSize("height");
 	
-	public static final int SCREEN_EdgeWidth  			= screen[config_n][2];
 	public static final int SCREEN_FrameRate  			= 30; // Maximum framerate
 	public static final int[] SCREEN_BackgroundColor 	= { 0, 50, 150 };
 
@@ -64,39 +63,28 @@ public class Set {
 	//public static final int 	KINECT_ConfigNumber 	= 2; // override
 	public static final int 	KINECT_ConfigNumber		= screen[config_n][3];
 	
-							// Format =     [ On, SetupMode, Render, AffectsSim, MirrorHoriz, MirrorVert ]
+							// Format =     [ On, SetupMode, Renderable, AffectsSim, MirrorHoriz, MirrorVert ]
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false, false, false },	// Everything Off
 													 { true,  true,  true,  true , false, false  },	// Everything On
-											   		 { true,  false, false, true , false, false  },	// RELEASE: Hidden w/ no setup, sparse sampling
+											   		 { true, false, false, true , false, false  },	// GOOD: Hidden w/ no setup, sparse sampling
 											   		 { true,  true,  true, true , false, false }, // setup mode, dense sampling
-													 { true, true, true, true, true, false }};
+													 { true,  true,  true, true, true, false }};
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
 												{  4 },
-												{ 15 },
+												{ 13 },
 												{ 5  },
 												{  2 }};
 	
 	public static final boolean KINECT_On 				= KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
 	public static final boolean KINECT_SetupMode		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][1]; // Let's you play with the parameters
 	
-	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
+	public static final boolean KINECT_Renderable			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
 	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
-	public static final int 	KINECT_CalibrationLevel = 200;	// Calibration sample size
-	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
-	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
 	public static final boolean KINECT_FancyStart		= true; // BROKEN
-	public static final boolean KINECT_MirrorHoriz		= KINECT_MODES[KINECT_ConfigNumber][4];
-	public static final boolean KINECT_MirrorVert		= KINECT_MODES[KINECT_ConfigNumber][5];
-
-	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
-	// Format = {x1,y1},{x2,y2}
-	public static final int[][][] KINECT_CoordTable 	= { {{-180,-450},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
-														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
-	public static final int[][] KINECT_Coord			= KINECT_CoordTable[0];
 
 	
 	public static final boolean JOGL_RenderShaders = false;
@@ -107,24 +95,15 @@ public class Set {
 	public static final String JOGL_VertexPath = "/Users/vestibule/java_workspace/Boids/warping.vert";
 	public static final String JOGL_FragmentPath = "/Users/vestibule/java_workspace/Boids/warping_water.frag";
 		
+	public static final boolean SHOW_Bases = false; // Local coordinate system for each fish
+	public static final boolean SHOW_KinematicVectors = false; // Current speed and accel
+	public static final boolean SHOW_AwarenessCone = false; // Forward cone to avoid things
+	public static final boolean SHOW_ObstacleTarget = false; // The area obstacles aim for when spawned
+	public static final boolean SHOW_Sprites = 			display_toggles[config_n][2]; // Whether we render sprites or draw by procedure
+	public static final boolean SHOW_Fullscreen = 		display_toggles[config_n][3];
 	
 	
-	public static final boolean SHOW_Bases =            display_toggles[config_n][0]; // Local coordinate system for each fish
-	public static final boolean SHOW_KinematicVectors = display_toggles[config_n][1]; // Current speed and accel
-	public static final boolean SHOW_Awareness =        display_toggles[config_n][2]; // Circle of awareness
-	public static final boolean SHOW_AwarenessCone =    display_toggles[config_n][3]; // Forward cone to avoid things
-	public static final boolean SHOW_Obstacle =         display_toggles[config_n][4]; // Normally on, but if you want to have invisible obstacles
-	public static final boolean SHOW_ObstacleTarget =   display_toggles[config_n][5]; // The area obstacles aim for when spawned
-	public static final boolean SHOW_Sprites = 			display_toggles[config_n][6]; // Whether we render sprites or draw by procedure
-	public static final boolean SHOW_Fullscreen = 		display_toggles[config_n][7];
-	
-	public static final int NUMBER_FishRed =    populations[config_n][0];
-	public static final int NUMBER_FishBlue =   populations[config_n][1];
-	public static final int NUMBER_FishGreen =  populations[config_n][2];
-	public static final int NUMBER_FishYellow = populations[config_n][3];
-	public static final int NUMBER_Obstacles =  populations[config_n][4];
 	public static final int NUMBER_People =     populations[config_n][5];
-	public static final int NUMBER_Sharks =     populations[config_n][6];
 	
 	
 	// These are relative and unit-less, nominally pixels in some cases
@@ -218,10 +197,44 @@ public class Set {
 	public static final int SHARK_SpeedCycle = 100;
 	public static final int SHARK_HealthLevels = 100;
 	
+	
+	/*--Live settings--*/
+	
+	public static boolean paused		= false;
+	
+	public static Integer screen_EdgeWidth  = screen[config_n][2]; // ID = 1
 
-	public static boolean paused				= false;
-	public static boolean kinect_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][1]); // Render the kinect in simulation
-	public static boolean kinect_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
+	public static Boolean show_Awareness = display_toggles[config_n][0]; // ID = 8 Circle of awareness
+	public static Boolean show_Obstacle =  display_toggles[config_n][1]; // ID = 9 Normally on, but if you want to have invisible obstacles
+	
+	public static Integer number_FishRed =    populations[config_n][0]; // ID=2
+	public static Integer number_FishBlue =   populations[config_n][1]; // ID=3
+	public static Integer number_FishGreen =  populations[config_n][2]; // ID=4
+	public static Integer number_FishYellow = populations[config_n][3]; // ID=5
+	public static Integer number_Obstacles =  populations[config_n][4]; // ID=6
+	public static Integer number_Sharks =     populations[config_n][6]; // ID=7
+
+	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
+	// Format = {x1,y1},{x2,y2}
+	public static final int[][][] kinect_CoordTable 	= { {{-180,-450},{SCREEN_Width+500,SCREEN_Height+450}},  // Initial museum steup
+														    {{   0,  0 },{SCREEN_Width,SCREEN_Height}} };// Full screen
+	public static final int[][] kinect_Coord			= kinect_CoordTable[0];
+
+	// id=10
+	public static Boolean kinect_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][1]); // Render the kinect in simulation
+	// id=11
+	public static Boolean kinect_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
+	// id=12
+	public static Boolean kinect_MirrorHoriz		= KINECT_MODES[KINECT_ConfigNumber][4];
+	// id=13
+	public static Boolean kinect_MirrorVert		= KINECT_MODES[KINECT_ConfigNumber][5];
+
+	// id=14
+	public static Integer kinect_FrameRatio		= 3;	// # of frames per Kinect update
+	// id=15
+	public static Integer kinect_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
+	// id=16
+	public static Integer kinect_CalibrationLevel = 200;	// Calibration sample size
 	
 	
 	// Used to initialize the screen width and height. Allows fullscreen support
@@ -229,8 +242,8 @@ public class Set {
 		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 				
-		if( string.equals("width") )   return (display_toggles[config_n][7]) ? dim.width  : screen[config_n][0];
-		if( string.equals("height") )  return (display_toggles[config_n][7]) ? dim.height : screen[config_n][1];
+		if( string.equals("width") )   return (display_toggles[config_n][3]) ? dim.width  : screen[config_n][0];
+		if( string.equals("height") )  return (display_toggles[config_n][3]) ? dim.height : screen[config_n][1];
 		else return -1;
 	
 	}

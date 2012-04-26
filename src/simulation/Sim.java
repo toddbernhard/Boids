@@ -40,6 +40,7 @@ public class Sim extends PApplet{
 	public static Kinect kinect; // kinect handle
 	public static Sprite fishSprite;
 	public static int backgroundColor;
+	public static Menu menu;
 	
 	
 	// OpenGL shader stuff
@@ -128,16 +129,16 @@ public class Sim extends PApplet{
 		}
 
 		// Create new fish with random position in screen and random speed
-		for (int i = 0; i < Set.NUMBER_FishRed + Set.NUMBER_FishBlue
-				+ Set.NUMBER_FishGreen + Set.NUMBER_FishYellow; i++) {
+		for (int i = 0; i < Set.number_FishRed + Set.number_FishBlue
+				+ Set.number_FishGreen + Set.number_FishYellow; i++) {
 
 			int color;
-			if (i < Set.NUMBER_FishRed) {
+			if (i < Set.number_FishRed) {
 				color = Fish.RED;
-			} else if (i < Set.NUMBER_FishRed + Set.NUMBER_FishBlue) {
+			} else if (i < Set.number_FishRed + Set.number_FishBlue) {
 				color = Fish.BLUE;
-			} else if (i < Set.NUMBER_FishRed + Set.NUMBER_FishBlue
-					+ Set.NUMBER_FishGreen) {
+			} else if (i < Set.number_FishRed + Set.number_FishBlue
+					+ Set.number_FishGreen) {
 				color = Fish.GREEN;
 			} else {
 				color = Fish.YELLOW;
@@ -156,8 +157,8 @@ public class Sim extends PApplet{
 
 		}
 
-		if (Set.NUMBER_Obstacles > 0) {
-			for (int i = 0; i < Set.NUMBER_Obstacles; i++) {
+		if (Set.number_Obstacles > 0) {
+			for (int i = 0; i < Set.number_Obstacles; i++) {
 				school.add(new Obstacle());
 			}
 		}
@@ -168,8 +169,8 @@ public class Sim extends PApplet{
 			}
 		}
 
-		if (Set.NUMBER_Sharks > 0) {
-			for (int i = 0; i < Set.NUMBER_Sharks; i++) {
+		if (Set.number_Sharks > 0) {
+			for (int i = 0; i < Set.number_Sharks; i++) {
 				school.add(new Shark(rand.nextFloat() * Set.SCREEN_Width, rand
 						.nextFloat() * Set.SCREEN_Height, 0, 0, this));
 			}
@@ -196,14 +197,14 @@ public class Sim extends PApplet{
 			frameCounter++;
 
 			// If Kinect is used, update it
-			if (kinect != null && frameCounter % Set.KINECT_FrameRatio == 0) {
+			if (kinect != null && frameCounter % Set.kinect_FrameRatio == 0) {
 				kinect.update();
 			}
 
 			background(backgroundColor); // Clear screen
 
 			// If we have obstacles and target is turned on, draw it
-			if (Set.NUMBER_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
+			if (Set.number_Obstacles > 0 && Set.SHOW_ObstacleTarget == true) {
 				fill(150, 0, 0, 40);
 				rect(Set.SCREEN_Width / 2, Set.SCREEN_Height / 2,
 						Set.OBSTACLE_TargetSize, Set.OBSTACLE_TargetSize);
@@ -217,57 +218,35 @@ public class Sim extends PApplet{
 
 			// Render the kinect if we should 
 			int color_index;
-			/*if (Set.KINECT_SetupMode
-					&& (Set.kinect_Render || kinect.config.mode == KinectConfig.MODE_RangeAdjust)) {
 
-				for (int i = 0; i < kinect.goodPixels.length; i++) {
-
-					color_index = (int) Boid.redoRange(
-							kinect.diffMap[kinect.goodPixels[i]], 0,
-							Kinect.NUM_COLORS-1, kinect.range, kinect.range
-									+ kinect.rangeSize);
-
-					if( kinect.config.showBackground ) {
-						if (kinect.diffMap[kinect.goodPixels[i]] < kinect.range ) {
-							color_index = 0;
-						} else if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize) {
-							color_index = Kinect.NUM_COLORS-1;
-						}
-					} else if( kinect.diffMap[kinect.goodPixels[i]] < kinect.range ||
-							   kinect.diffMap[kinect.goodPixels[i]] > kinect.range+kinect.rangeSize ) {
-						continue;
-					}
-					stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
-
-					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
-							kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
-				}
-			} else 
-			*/
-			if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
-
-				for (int i = 0; i < kinect.goodPixels.length; i++) {
-
-					if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range
-							&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range
+			if (Set.KINECT_On && Set.KINECT_Renderable) { 
+				if( Set.kinect_Render ) {
+					for (int i = 0; i < kinect.goodPixels.length; i++) {
+						
+						if (kinect.diffMap[kinect.goodPixels[i]] > kinect.range
+								&& kinect.diffMap[kinect.goodPixels[i]] < kinect.range
 									+ kinect.rangeSize) {
-						if (kinect.depthMap[kinect.goodPixels[i]] < Kinect.DEPTH_MIN) {
-							color_index = 0;
-						} else if (kinect.depthMap[kinect.goodPixels[i]] > Kinect.DEPTH_MAX) {
-							color_index = Kinect.NUM_COLORS;
-						} else {
-							color_index = kinect.mapDepthToColor[kinect.depthMap[kinect.goodPixels[i]]];
+							if (kinect.depthMap[kinect.goodPixels[i]] < Kinect.DEPTH_MIN) {
+								color_index = 0;
+							} else if (kinect.depthMap[kinect.goodPixels[i]] >= Kinect.DEPTH_MAX) {
+								color_index = Kinect.NUM_COLORS-1;
+							} else {
+								color_index = kinect.mapDepthToColor[kinect.depthMap[kinect.goodPixels[i]]];
+							}
+
+							stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
+
+							point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
+									kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
 						}
-
-						stroke(colors.get(Kinect.COLOR_OFFSET + color_index));
-
-						point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
-								kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
 					}
 				}
 			}
 			
 		} else { // paused
+			if( menu == null ) {
+				menu = new Menu(this);
+			}
 			
 			background(backgroundColor);
 			
@@ -276,13 +255,15 @@ public class Sim extends PApplet{
 				school.get(i).drawBoid(this);
 			}
 			
+			menu.drawSelf();
+			
 			// Display StdDev Adjust mode for Kinect
 			if (Set.KINECT_SetupMode
 					&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {
 				background(10, 40, 100); // Clear screen
 
 				for (int i = 0; i < kinect.depthMap.length; i++) {
-					if (kinect.config.stats[i].getStdDev() > kinect.filterThreshold) {
+					if (kinect.stdDevs[i] > kinect.filterThreshold) {
 						
 						if( kinect.filter ) stroke(80,50,50);
 						else stroke(255);
@@ -339,11 +320,18 @@ public class Sim extends PApplet{
 	@Override
 	public void keyPressed() {
 
-		switch(key) {
-		case ' ':
+		if( key == ' ' ) {
 			Set.paused = !Set.paused;
 			System.out.println(Set.paused ? "PAUSE" : "PLAY");
 			return;
+		}
+		
+		if( Set.paused ) {
+			menu.keyPressed(key, keyCode);
+			return;
+		}
+		
+		switch(key) {
 		case 'a':
 			if( Set.KINECT_On ) {
 				Set.kinect_AffectsSim = !Set.kinect_AffectsSim;
@@ -353,7 +341,7 @@ public class Sim extends PApplet{
 			}
 			return;
 		case 's':
-			if( Set.KINECT_On && Set.KINECT_INIT_Render ) {
+			if( Set.KINECT_On && Set.KINECT_Renderable ) {
 				Set.kinect_Render = !Set.kinect_Render;
 				System.out.println(Set.kinect_Render ? "showing kinect" : "hiding kinect");
 			} else {
