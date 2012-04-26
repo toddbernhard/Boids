@@ -17,9 +17,9 @@ public class Set {
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
-		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+			1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
-			3; // Same as 1 but w/ setup mode and dense sampling for renders
+		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
 		//	5; // testing for drawing the fish
 			

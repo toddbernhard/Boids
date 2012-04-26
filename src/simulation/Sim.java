@@ -300,8 +300,8 @@ public class Sim extends PApplet{
 						if( kinect.filter ) stroke(80,50,50);
 						else stroke(255);
 						
-						point(kinect.mapKinectToSim_Col[i % 640],
-								kinect.mapKinectToSim_Row[i / 640]);
+						point(kinect.mapKinectToSim_Col[i],
+								kinect.mapKinectToSim_Row[i]);
 					}
 				}
 			} else {
