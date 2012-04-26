@@ -319,15 +319,15 @@ public class Sim extends PApplet{
 	 */
 	@Override
 	public void keyPressed() {
-
-		if( key == ' ' ) {
-			Set.paused = !Set.paused;
-			System.out.println(Set.paused ? "PAUSE" : "PLAY");
-			return;
-		}
 		
 		if( Set.paused ) {
 			menu.keyPressed(key, keyCode);
+			return;
+		}
+		
+		if( key == ' ' ) {
+			Set.paused = !Set.paused;
+			System.out.println(Set.paused ? "PAUSE" : "PLAY");
 			return;
 		}
 		

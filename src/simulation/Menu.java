@@ -2,8 +2,13 @@ package simulation;
 
 import java.util.ArrayList;
 
+import boids.Fish;
+import boids.Obstacle;
+import boids.Shark;
+
 import processing.core.PConstants;
 import processing.core.PFont;
+import processing.core.PVector;
 
 public class Menu {
 	
@@ -27,7 +32,9 @@ public class Menu {
 	private ArrayList<Option> generalOptions, kinectOptions;
 	private String[] modeStrings;
 	
-	//private boolean needsKinectRefresh
+	private boolean needsKinectRefresh;
+	private boolean needsKinectInit;
+	private boolean needsPopulationCheck;
 	
 	private int mode;
 	private int selected;
@@ -66,6 +73,9 @@ public class Menu {
 		kinectOptions.add( new Option(16, "Calibration level", Set.kinect_CalibrationLevel, 0, null) );
 
 		selected = NUM_MODES;
+		needsKinectInit = false;
+		needsKinectRefresh = false;
+		needsPopulationCheck = false;
 	}
 	
 	public void drawSelf() {
@@ -176,6 +186,12 @@ public class Menu {
 	
 	public void keyPressed(char key, int keyCode) {
 		
+		if(key == ' ') {
+			closeMenu();
+			Set.paused = false;
+			return;
+		}
+		
 		int greatestIndex = NUM_MODES-1;
 		if( mode == GENERAL )  greatestIndex += generalOptions.size();
 		else if( mode == KINECT ) greatestIndex += kinectOptions.size();
@@ -251,12 +267,30 @@ public class Menu {
 			Set.screen_EdgeWidth = chosen.boolValue ? 50 : 0;
 			break;
 		
-		case 2:		break; // fish red
-		case 3:		break; // fish blue
-		case 4:		break; // fish green
-		case 5:		break; // fish yellow
-		case 6:		break; // obstacles
-		case 7:		break; // sharks
+		case 2: // fish red
+			Set.number_FishRed = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
+		case 3: // fish blue
+			Set.number_FishBlue = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
+		case 4: // fish green
+			Set.number_FishGreen = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
+		case 5: // fish yellow
+			Set.number_FishYellow = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
+		case 6: // obstacles
+			Set.number_Obstacles = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
+		case 7: // sharks
+			Set.number_Sharks = chosen.intValue;
+			needsPopulationCheck = true;
+			break;
 		
 		case 8:	// show awareness
 			Set.show_Awareness = chosen.boolValue;
@@ -289,13 +323,236 @@ public class Menu {
 			
 		case 15: // kinect sample interval
 			Set.kinect_SampleInterval = chosen.intValue;
-			Sim.kinect.refreshGoodPixels();
+			needsKinectRefresh = true;
 			break;
 			
 		case 16: // calibration level
 			Set.kinect_CalibrationLevel  = chosen.intValue;
+			needsKinectInit = true;
 			break;
 		
+		}
+	}
+	
+	public void closeMenu() {
+		if( needsKinectInit ) {
+			Sim.kinect.init();
+			needsKinectInit = false;
+		}
+		
+		if( needsKinectRefresh ) {
+			Sim.kinect.refreshGoodPixels();
+			needsKinectRefresh = false;
+		}
+		
+		if( needsPopulationCheck ) {
+			int fishes[] = {0,0,0,0};
+			int obstacles = 0;
+			int sharks = 0;
+			
+			Boid boid;
+			for( int i=0; i<sim.school.size(); i++) {
+				boid = sim.school.get(i);
+				
+				switch(boid.getTYPE()) {
+				case FISH:
+					int color = ((Fish) boid).style;
+					
+					if( color == 0 && fishes[color] == Set.number_FishRed ) {
+						sim.school.remove(i);
+						i--;
+					} else if( color == 1 && fishes[color] == Set.number_FishBlue ) {
+						sim.school.remove(i);
+						i--;
+					} else if( color == 2 && fishes[color] == Set.number_FishGreen ) {
+						sim.school.remove(i);
+						i--;
+					} else if( color == 3 && fishes[color] == Set.number_FishYellow ) {
+						sim.school.remove(i);
+						i--;
+					} else {
+						fishes[color]++;
+					}
+					
+					break;
+					
+				case OBSTACLE:
+					if( obstacles == Set.number_Obstacles ) {
+						sim.school.remove(i);
+					} else {
+						obstacles++;
+					}
+					break;
+				case SHARK:
+					if( sharks == Set.number_Sharks ) {
+						sim.school.remove(i);
+					} else {
+						sharks++;
+					}
+					break;
+				}
+			}
+			
+			PVector position = new PVector();
+			for( int i=fishes[0]; i<Set.number_FishRed; i++) {
+				int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
+				
+				if( sourcePixel < Set.SCREEN_Width ) {
+				// Entering from TOP	
+					position.x = sourcePixel;
+					position.y = 0;
+					
+				} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
+				// Entering from RIGHT
+					position.x = Set.SCREEN_Width;
+					position.y = sourcePixel - Set.SCREEN_Width;
+					
+				} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
+				// Entering from BOTTOM
+					position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+					position.y = Set.SCREEN_Height;
+					
+				} else {
+				// Entereing from LEFT
+					position.x = 0;
+					position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
+					
+				}
+				sim.school.add(new Fish(position, new PVector((sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2), Set.FISH_MinSize
+						+ sim.rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), sim,
+						0));
+			}
+			
+			for( int i=fishes[1]; i<Set.number_FishBlue; i++) {
+				int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
+				
+				if( sourcePixel < Set.SCREEN_Width ) {
+				// Entering from TOP	
+					position.x = sourcePixel;
+					position.y = 0;
+					
+				} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
+				// Entering from RIGHT
+					position.x = Set.SCREEN_Width;
+					position.y = sourcePixel - Set.SCREEN_Width;
+					
+				} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
+				// Entering from BOTTOM
+					position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+					position.y = Set.SCREEN_Height;
+					
+				} else {
+				// Entereing from LEFT
+					position.x = 0;
+					position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
+					
+				}
+				sim.school.add(new Fish(position, new PVector((sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2), Set.FISH_MinSize
+						+ sim.rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), sim,
+						1));
+			}
+			
+			for( int i=fishes[2]; i<Set.number_FishGreen; i++) {
+				int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
+				
+				if( sourcePixel < Set.SCREEN_Width ) {
+				// Entering from TOP	
+					position.x = sourcePixel;
+					position.y = 0;
+					
+				} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
+				// Entering from RIGHT
+					position.x = Set.SCREEN_Width;
+					position.y = sourcePixel - Set.SCREEN_Width;
+					
+				} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
+				// Entering from BOTTOM
+					position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+					position.y = Set.SCREEN_Height;
+					
+				} else {
+				// Entereing from LEFT
+					position.x = 0;
+					position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
+					
+				}
+				sim.school.add(new Fish(position, new PVector((sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2), Set.FISH_MinSize
+						+ sim.rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), sim,
+						2));
+			}
+			
+			System.out.println("should be="+Set.number_FishYellow+" is="+fishes[3]);
+			for( int i=fishes[3]; i<Set.number_FishYellow; i++) {
+				int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
+				
+				if( sourcePixel < Set.SCREEN_Width ) {
+				// Entering from TOP	
+					position.x = sourcePixel;
+					position.y = 0;
+					
+				} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
+				// Entering from RIGHT
+					position.x = Set.SCREEN_Width;
+					position.y = sourcePixel - Set.SCREEN_Width;
+					
+				} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
+				// Entering from BOTTOM
+					position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+					position.y = Set.SCREEN_Height;
+					
+				} else {
+				// Entereing from LEFT
+					position.x = 0;
+					position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
+					
+				}
+				sim.school.add(new Fish(position, new PVector((sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2), Set.FISH_MinSize
+						+ sim.rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), sim,
+						3));
+			}
+			
+			for( int i=sharks; i<Set.number_Sharks; i++) {
+				int sourcePixel = Sim.rand.nextInt( 2*(Set.SCREEN_Height+Set.SCREEN_Width) );
+				
+				if( sourcePixel < Set.SCREEN_Width ) {
+				// Entering from TOP	
+					position.x = sourcePixel;
+					position.y = 0;
+					
+				} else if( sourcePixel < Set.SCREEN_Width+Set.SCREEN_Height ) {
+				// Entering from RIGHT
+					position.x = Set.SCREEN_Width;
+					position.y = sourcePixel - Set.SCREEN_Width;
+					
+				} else if( sourcePixel < 2*Set.SCREEN_Width + Set.SCREEN_Height ) {
+				// Entering from BOTTOM
+					position.x = sourcePixel - Set.SCREEN_Width - Set.SCREEN_Height;
+					position.y = Set.SCREEN_Height;
+					
+				} else {
+				// Entereing from LEFT
+					position.x = 0;
+					position.y = sourcePixel - 2*Set.SCREEN_Width - Set.SCREEN_Height;
+					
+				}
+				sim.school.add(new Shark(position.x, position.y, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, (sim.rand.nextFloat() - .5f)
+						* Set.FISH_MaxSpeed / 2, Set.FISH_MinSize
+						+ sim.rand.nextInt(Set.FISH_MaxSize - Set.FISH_MinSize), sim ) );
+			}
+			
+			for( int i=obstacles; i<Set.number_Obstacles; i++) {
+
+				sim.school.add(new Obstacle());
+			}
 		}
 	}
 
@@ -307,6 +564,7 @@ public class Menu {
 		public Boolean boolValue;
 		public Integer intValue;
 		public Integer[] intMaxMin;
+		public Fish fish;
 		
 		public Option(int id, String text, boolean bool) {
 			this.ID = id;
