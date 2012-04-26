@@ -67,9 +67,9 @@ public class Sim extends PApplet{
 		frameCounter = 0;
 		rand = new Random();
 		
-		backgroundColor = color(Set.SCREEM_BackgroundColor[0],
-								Set.SCREEM_BackgroundColor[1],
-								Set.SCREEM_BackgroundColor[2]);
+		backgroundColor = color(Set.SCREEN_BackgroundColor[0],
+								Set.SCREEN_BackgroundColor[1],
+								Set.SCREEN_BackgroundColor[2]);
 		colors = new ArrayList<Integer>();
 		school = new ArrayList<Boid>();
 
