@@ -64,11 +64,11 @@ public class Set {
 	//public static final int 	KINECT_ConfigNumber 	= 2; // override
 	public static final int 	KINECT_ConfigNumber		= screen[config_n][3];
 	
-							// Format =     [ On, SetupMode, Render, AffectsSim ]
-	private static final boolean[][] KINECT_MODES = {{ false, false, false, false },	// Everything Off
-													 { true,  true,  true,  true  },	// Everything On
-											   		 { true,  false, false, true  },	// RELEASE: Hidden w/ no setup, sparse sampling
-											   		 { true,  true,  true, true }};	// setup mode, dense sampling
+							// Format =     [ On, SetupMode, Render, AffectsSim, MirrorHoriz, MirrorVert ]
+	private static final boolean[][] KINECT_MODES = {{ false, false, false, false, false, false },	// Everything Off
+													 { true,  true,  true,  true , false, false  },	// Everything On
+											   		 { true,  false, false, true , false, false  },	// RELEASE: Hidden w/ no setup, sparse sampling
+											   		 { true,  true,  true, true , false, false }};	// setup mode, dense sampling
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
@@ -87,6 +87,8 @@ public class Set {
 	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
 	public static final boolean KINECT_FancyStart		= true; // BROKEN
+	public static final boolean KINECT_MirrorHoriz		= KINECT_MODES[KINECT_ConfigNumber][4];
+	public static final boolean KINECT_MirrorVert		= KINECT_MODES[KINECT_ConfigNumber][5];
 
 	// Just a table of the various configurations. Gives the in-Sim pixel-coordinates of the top-left and bottom-right corners
 	// Format = {x1,y1},{x2,y2}

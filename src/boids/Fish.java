@@ -196,6 +196,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		PVector displaceVector = new PVector();
 		float displaceMag;
 		Boid other;
+		boolean seesCloud = false;
 		
 		for( i=0; i<school.size(); i++ ) {	
 			other = school.get(i);
@@ -291,7 +292,7 @@ public class Fish extends Boid implements Aware, Flockable, HasSprites {
 		}
 		
 		// if the fish is alone, no acceleration vector
-		if( nearbyCount > 0 ) {
+		if( nearbyCount > 0 || seesCloud) {
 			
 			//separation.normalize();
 			

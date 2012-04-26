@@ -255,15 +255,30 @@ public class Kinect {
 					Set.KINECT_Coord[1][1] - Set.KINECT_Coord[0][1]);
 		}
 
-		for (int i = 0; i < 640*480; i++) {
-			mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
-					Set.KINECT_Coord[1][0], 0, 640);
+		for (int i = 0; i < 640*480; i++) {		
+			// If we are supposed to flip horizontally, map from KINECT_Coord(inates) to [640,0] instead of [0,640]
+			if( Set.KINECT_MirrorHoriz) {
+				mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
+						Set.KINECT_Coord[1][0], 640, 0);
+			// If not, map to [0,640]
+			} else {
+				mapKinectToSim_Col[i] = (int) Boid.redoRange(i%640, Set.KINECT_Coord[0][0],
+						Set.KINECT_Coord[1][0], 0, 640);
+			}
 		}
 
 		for (int i = 0; i < 640*480; i++) {
-			mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
-					Set.KINECT_Coord[1][1], 0, 480);
+			// If we are supposed to flip vertically, map from KINECT_Coord(inates) to [480,0] instead of [0,480]
+			if( Set.KINECT_MirrorVert) {
+				mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
+				Set.KINECT_Coord[1][1], 480, 0);
+			// If not, map to [0,640]
+			} else {
+				mapKinectToSim_Row[i] = (int) Boid.redoRange(i/640, Set.KINECT_Coord[0][1],
+				Set.KINECT_Coord[1][1], 0, 480);
+			}
 		}
+
 	}
 	
 	
