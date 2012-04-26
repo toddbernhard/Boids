@@ -58,7 +58,7 @@ public class Set {
 	
 	public static final int SCREEN_EdgeWidth  			= screen[config_n][2];
 	public static final int SCREEN_FrameRate  			= 30; // Maximum framerate
-	public static final int[] SCREEM_BackgroundColor 	= { 0, 50, 150 };
+	public static final int[] SCREEN_BackgroundColor 	= { 0, 50, 150 };
 
 	
 	//public static final int 	KINECT_ConfigNumber 	= 2; // override
