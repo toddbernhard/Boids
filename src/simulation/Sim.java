@@ -183,35 +183,13 @@ public class Sim extends PApplet{
 			
 		if (Set.KINECT_On) {
 			kinect = new Kinect(this, Kinect.MOTION_DETECTION);
-//			if( Set.KINECT_FancyStart == false ) {
-				kinect.init();
-//			} else {*/
-//				
-//				for(int i=0; i<=Set.KINECT_CalibrationLevel; i++) {
-//					kinect.initFancy(i);
-//					drawInitFancy(i);
-//				}
-
-		//	}
-/*			if(Set.KINECT_FancyStart) {
-				mapFancyInit = new int[Set.KINECT_CalibrationLevel+1];
-				for(int i=0; i<Set.KINECT_CalibrationLevel; i++) {
-					mapFancyInit[i] = (int)Boid.redoRange(i, Set.SCREEN_Width/2, 1, 0, Set.KINECT_CalibrationLevel );
-				}*/
-			//}
+			kinect.init();
 		}
 	}
 
 
 	@Override
 	public void draw() {
-		
-		/*
-		if(frameCount<=Set.KINECT_CalibrationLevel) {
-			drawFancyInit(frameCount);
-			//System.out.println(frameCount);
-		} else
-		*/
 		
 		// Display the simulation
 		if (Set.paused == false) {
@@ -239,7 +217,7 @@ public class Sim extends PApplet{
 
 			// Render the kinect if we should 
 			int color_index;
-			if (Set.KINECT_SetupMode
+			/*if (Set.KINECT_SetupMode
 					&& (Set.kinect_Render || kinect.config.mode == KinectConfig.MODE_RangeAdjust)) {
 
 				for (int i = 0; i < kinect.goodPixels.length; i++) {
@@ -264,7 +242,9 @@ public class Sim extends PApplet{
 					point(kinect.mapKinectToSim_Col[kinect.goodPixels[i]],
 							kinect.mapKinectToSim_Row[kinect.goodPixels[i]]);
 				}
-			} else if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
+			} else 
+			*/
+			if (Set.KINECT_On && Set.kinect_Render) { // implied Set.KINECT_SetupMode is false
 
 				for (int i = 0; i < kinect.goodPixels.length; i++) {
 
@@ -288,7 +268,14 @@ public class Sim extends PApplet{
 			}
 			
 		} else { // paused
-						
+			
+			background(backgroundColor);
+			
+			for (int i = 0; i < school.size(); i++) {
+				//i += school.get(i).step(school);  don't step, only draw
+				school.get(i).drawBoid(this);
+			}
+			
 			// Display StdDev Adjust mode for Kinect
 			if (Set.KINECT_SetupMode
 					&& kinect.config.mode == KinectConfig.MODE_StdDevAdjust) {

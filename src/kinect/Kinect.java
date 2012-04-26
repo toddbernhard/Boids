@@ -47,7 +47,7 @@ public class Kinect {
 
 	public RunningStat[] stats;
 	
-	public int alphaChannel = 200;
+	public int alphaChannel = 255;
 
 	
 	public Kinect(Sim simul, int mode) {

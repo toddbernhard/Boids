@@ -17,11 +17,11 @@ public class Set {
 	
 	public static final int config_n = 
 		//	0; // Test configuration with all options turned on
-			1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
+		//	1; // Kinect hidden, LOTS of fish, no borders.  could use for vestibule
 		//	2; // Old demo 1: no kinect, red fish w/ sharks in small screen
 		//	3; // Same as 1 but w/ setup mode and dense sampling for renders
 		//	4; // Sprites test
-		//	5; // testing for drawing the fish
+			5; // test, very ense renders
 			
 						   // Format =    [ Scrn W, Scrn H, Edge, KinectConfig# ]
 	private static final int[][] screen =  {{  800,    600,    50, 		1 },
@@ -29,7 +29,7 @@ public class Set {
 										   {  800,    600,    50,		0 },
 										   {  800,    600,     0, 		3 },
 										   {  800,    600,    50,		0 },
-										   {  800,    600,     0, 		0 }};
+										   {  800,    600,     0, 		4 }};
 
 	
 	private static final boolean[][] display_toggles =  
@@ -48,7 +48,7 @@ public class Set {
 												{ 400,      0,      0,         0,         0,      0,     4    },
 												{ 400,    200,     50,        50,         0,      0,     0    },
 												{ 40,      40,     40,        40,         0,      0,     4    },
-												{ 350,    150,     50,        50,         0,      0,     0    }};
+												{ 10,    10,     10,        5,         0,      0,     0    }};
 	
 	
 	// TODO NOT FINAL. be careful that we never set these. maybe use getter/setters, but don't want the function call
@@ -68,13 +68,15 @@ public class Set {
 	private static final boolean[][] KINECT_MODES = {{ false, false, false, false, false, false },	// Everything Off
 													 { true,  true,  true,  true , false, false  },	// Everything On
 											   		 { true,  false, false, true , false, false  },	// RELEASE: Hidden w/ no setup, sparse sampling
-											   		 { true,  true,  true, true , false, false }};	// setup mode, dense sampling
+											   		 { true,  true,  true, true , false, false }, // setup mode, dense sampling
+													 { true, true, true, true, true, false }};
 	
 							// Format =		[ SampleInterval ]
 	private static final int[][] KINECT_INTS = {{  0 },
 												{  4 },
 												{ 15 },
-												{ 5  }};
+												{ 5  },
+												{  2 }};
 	
 	public static final boolean KINECT_On 				= KINECT_MODES[KINECT_ConfigNumber][0]; // Global on/off
 	public static final boolean KINECT_SetupMode		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][1]; // Let's you play with the parameters
@@ -82,7 +84,7 @@ public class Set {
 	public static final boolean KINECT_INIT_Render			= KINECT_On && (KINECT_SetupMode || KINECT_MODES[KINECT_ConfigNumber][2]); // Render the kinect in simulation
 	public static final boolean KINECT_INIT_AffectsSim		= KINECT_On && KINECT_MODES[KINECT_ConfigNumber][3]; // Whether fish react to kinect
 	
-	public static final int 	KINECT_CalibrationLevel = 1000;	// Calibration sample size
+	public static final int 	KINECT_CalibrationLevel = 200;	// Calibration sample size
 	public static final int		KINECT_FrameRatio		= 3;	// # of frames per Kinect update
 	public static final int 	KINECT_SampleInterval   = KINECT_INTS[KINECT_ConfigNumber][0];  // uses only 1 pixel per interval in each dimension, so 3 --> 1/9 the pixels
 	public static final float   KINECT_DefaultFilter	= 70; // pixels w/ a larger stddev are filtered out
